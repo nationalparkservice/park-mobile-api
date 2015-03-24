@@ -1,0 +1,35 @@
+{
+  "name": "resize-app",
+  "version": "0.0.1",
+  "description": "A JSON flat file tag list to SQL converter for rendering purposes",
+  "keywords": [
+    "nps",
+    "resize"
+  ],
+  "author": "Jim McAndrew <james_mcandrew@partner.nps.gov>",
+  "license": "Public Domain",
+  "contributors": [{
+    "name": "Jim McAndrew",
+    "email": "james_mcandrew@partner.nps.gov"
+  }, {
+    "name": "Nate Irwin",
+    "email": "nate_irwin@nps.gov"
+  }],
+  "scripts": {
+    "start": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/nationalparkservice/resize-app"
+  },
+  "dependencies": {
+    "adm-zip": "0.4.7",
+    "bluebird": "2.9.12",
+    "btoa": "1.1.2",
+    "datawrap": "git+http://github.com/jimmyrocks/datawrap",
+    "express": "4.12.2",
+    "magic-resize": "git+http://github.com/jimmyrocks/magick-resize",
+    "multer": "0.1.8",
+    "request": "2.53.0"
+  }
+}
