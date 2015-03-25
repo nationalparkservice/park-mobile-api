@@ -6,7 +6,7 @@
 var fs = require('fs');
 
 module.exports = function(imageList) {
-  console.log('a10');
+  console.log('c0');
   var AllFileList = [],
     errorList = [],
     fileList = [];
@@ -19,10 +19,12 @@ module.exports = function(imageList) {
   });
   fileList.map(function(file) {
     try {
+      console.log('c1');
       if (fs.existsSync(file)) {
         fs.unlinkSync(file);
       }
     } catch (err) {
+      console.log('c2');
       errorList.push({
         'file': file,
         'error': err
