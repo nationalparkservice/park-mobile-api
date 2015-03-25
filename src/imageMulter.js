@@ -1,4 +1,5 @@
-var multer = require('multer');
+var errorLog = require('./errorLog'),
+  multer = require('multer');
 
 module.exports = multer({
   dest: './uploads/',
@@ -6,6 +7,6 @@ module.exports = multer({
     return filename.replace(/\W+/g, ' - ').toLowerCase() + Date.now();
   },
   onFileUploadComplete: function(file) {
-    console.log(file.originalname + 'uploaded to ' + file.path);
+    errorLog(file.originalname + 'uploaded to ' + file.path);
   }
 });
