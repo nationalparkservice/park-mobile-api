@@ -1,10 +1,11 @@
 var Bluebird = require('bluebird'),
+  errorLog = require('./errorLog'),
   magickResize = require('magick-resize'),
   path = require('path');
 
 module.exports = function(filePath, uuid, type) {
   return new Bluebird(function(fulfill, reject) {
-    console.log('b1');
+    errorLog('b1');
     // TODO: Better temp output filenames!
     var args = {
       'f': filePath,
@@ -17,15 +18,15 @@ module.exports = function(filePath, uuid, type) {
         args.error = e;
         args.result = r;
         if (e) {
-          console.log('b2');
+          errorLog('b2');
           reject(args);
         } else {
-          console.log('b3');
+          errorLog('b3');
           fulfill(args);
         }
       });
     } catch (err) {
-      console.log('b4');
+      errorLog('b4');
       args.error = err;
       reject(args);
     }
