@@ -87,12 +87,16 @@ var writeFile = function(localFileName, githubFileName, githubSettings) {
       .then(function(fileData) {
         checkGithubFile(requestOptions)
           .then(function(githubFile) {
-            writeGithubData(requestOptions, githubSettings, fileData, githubFile)
-              .then(fulfill)
-              .catch(function(e) {
-                errorLog('e4');
-                reject(e);
-              });
+            if (config.debug) {
+              fulfill({});
+            } else {
+              writeGithubData(requestOptions, githubSettings, fileData, githubFile)
+                .then(fulfill)
+                .catch(function(e) {
+                  errorLog('e4');
+                  reject(e);
+                });
+            }
           })
           .catch(function(e) {
             errorLog('e5');
