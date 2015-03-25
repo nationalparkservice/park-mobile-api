@@ -3,13 +3,15 @@
 /* This is done using sync to make error trapping easier */
 /* returns an array of each file and if it was deleted or errored */
 
-var fs = require('fs');
+var errorLog = require('./errorLog'),
+  fs = require('fs');
 
 module.exports = function(imageList) {
-  console.log('c0');
+  errorLog('c0');
   var AllFileList = [],
     errorList = [],
     fileList = [];
+  errorLog(imageList);
   imageList.map(function(img) {
     fileList.push(img.f);
     fileList.push(img.o);
@@ -19,12 +21,12 @@ module.exports = function(imageList) {
   });
   fileList.map(function(file) {
     try {
-      console.log('c1');
+      errorLog('c1');
       if (fs.existsSync(file)) {
         fs.unlinkSync(file);
       }
     } catch (err) {
-      console.log('c2');
+      errorLog('c2');
       errorList.push({
         'file': file,
         'error': err
