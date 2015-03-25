@@ -1,34 +1,35 @@
 var config = require('../config'),
   createUuid = require('./createUuid'),
   datawrap = require('datawrap'),
-  deleteImages = require('./deleteImages'),
+  deleteImages = require('./cleanup'),
+  errorLog = require('./errorLog'),
   resizeImage = require('./resizeImage'),
   runList = datawrap.runList,
   writeImages = require('./writeImages');
 
 module.exports = function(req, res) {
   // Default these to null if they're empty
-  req.body.uuid = req.body.uuid.length > 0 ? req.body.uuid : null;
-  req.body.uuidPattern = req.body.uuid.length > 0 ? req.body.uuidPattern : null;
+  req.body.uuid = req.body.uuid && req.body.uuid.trim().length > 0 ? req.body.uuid : null;
+  req.body.uuidPattern = req.body.uuidPattern && req.body.uuidPattern.trim().length > 0 ? req.body.uuidPattern : null;
 
   var field = 'userPhoto',
     file = {},
     githubSettings = {
-      'account': req.body.githubAccount || config.github.account,
-      'branch': req.body.githubBranch || config.github.branch,
-      'repo': req.body.githubRepo || config.github.repo,
-      'path': req.body.githubPath,
+      'account': (req.body.githubAccount || config.github.account),
+      'branch': (req.body.githubBranch || config.github.branch),
+      'repo': (req.body.githubRepo || config.github.repo),
+      'relativePath': req.body.path
     },
     taskList = [],
     uuid = req.body.uuid || createUuid(req.body.uuidPattern);
-  console.log(req.body);
+  errorLog(req.body);
   if (req.files[field]) {
     file = req.files[field];
-    console.log('a0');
+    errorLog('a0');
 
     // First we make a list of everything that needs to be resized
     req.body.types.map(function(type) {
-      console.log('a6');
+      errorLog('a6');
       taskList.push({
         'name': 'Resizing to ' + type,
         'task': resizeImage,
@@ -39,7 +40,7 @@ module.exports = function(req, res) {
     // Then we actually resize it all
     runList(taskList, 'resize images')
       .then(function(result) {
-        console.log('a1');
+        errorLog('a1');
         writeImages(result, githubSettings)
           .then(function() {
             deleteImages(result);
@@ -51,13 +52,13 @@ module.exports = function(req, res) {
           });
       })
       .catch(function(result) {
-        console.log('a4');
+        errorLog('a4');
         deleteImages(result);
         res.send('Error: ' + result.error);
       });
 
   } else {
-    console.log('a4');
+    errorLog('a4');
     res.send('No file uploaded');
   }
 };
