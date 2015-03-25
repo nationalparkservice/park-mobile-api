@@ -1,5 +1,6 @@
 var Bluebird = require('bluebird'),
   datawrap = require('datawrap'),
+  errorLog = require('./errorLog'),
   fs = require('fs'),
   runList = datawrap.runList,
   path = require('path'),
@@ -7,7 +8,7 @@ var Bluebird = require('bluebird'),
 
 module.exports = function(imageList, githubSettings) {
   return new Bluebird(function(fulfill, reject) {
-    console.log('w0');
+    errorLog('w0');
     var taskList = [];
     imageList.map(function(img) {
       if (fs.existsSync(img.o)) {
