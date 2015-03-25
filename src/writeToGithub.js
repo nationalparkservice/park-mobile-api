@@ -87,7 +87,7 @@ var writeFile = function(localFileName, githubFileName, githubSettings) {
       .then(function(fileData) {
         checkGithubFile(requestOptions)
           .then(function(githubFile) {
-            if (config.debug) {
+            if (config.github.disabled) {
               fulfill({});
             } else {
               writeGithubData(requestOptions, githubSettings, fileData, githubFile)
