@@ -12,27 +12,34 @@ module.exports = function(imageList) {
     errorList = [],
     fileList = [];
   errorLog(imageList);
+  errorLog('c1');
   imageList.map(function(img) {
-    fileList.push(img.f);
-    fileList.push(img.o);
+    AllFileList.push(img.f);
+    AllFileList.push(img.o);
   });
+  errorLog('c2');
   fileList = AllFileList.filter(function(elem, pos) {
     return AllFileList.indexOf(elem) === pos;
   });
+  errorLog('c3');
+  errorLog(fileList);
+  errorLog('c4');
   fileList.map(function(file) {
+    errorLog('c5');
     try {
-      errorLog('c1');
+      errorLog('c6');
       if (fs.existsSync(file)) {
         fs.unlinkSync(file);
       }
     } catch (err) {
-      errorLog('c2');
+      errorLog('c7');
       errorList.push({
         'file': file,
         'error': err
       });
     }
   });
+  errorLog('c8');
   return {
     'error': errorList.length > 0 ? errorList : null,
     'files': fileList
