@@ -1,10 +1,10 @@
 <form id="uploadForm" enctype="multipart/form-data" action="/api/photo" method="post">
-  <input type="file" name="userPhoto" /><br/>
-  uuid: <input type="text" name="uuid" /><br/>
-  account: <input type="text" name="account" />nationalparkservice<br/>
-  branch: <input type="text" name="branch" />gh-pages<br/>
-  repo: <input type="text" name="repo" />data<br/>
-  path: <input type="text" name="path" />/places_mobile/klgo_legacy/media<br/>
+  <input type="file" name="userPhoto" />* required<br/>
+  uuid: <input type="text" name="uuid" />(required only if updating an image)<br/>
+  account: <input type="text" name="account" value="nationalparkservice"/><br/>
+  branch: <input type="text" name="branch" value="gh-pages"/><br/>
+  repo: <input type="text" name="repo" value="data"/><br/>
+  path: <input type="text" name="path" value="/places_mobile/klgo_legacy/media" size="60"/>* required<br/>
   <input type="checkbox" name="types" value="image_350">image_350  </input><br/>
   <input type="checkbox" name="types" value="image_480">image_480  </input><br/>
   <input type="checkbox" name="types" value="image_640">image_640  </input><br/>
