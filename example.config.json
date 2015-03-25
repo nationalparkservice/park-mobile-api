@@ -1,11 +1,11 @@
 {
   "appName": "Image Uploader",
+  "debug": false,
   "github": {
     "account": "DEFAULT ACCOUNT",
     "branch": "master",
     "repo": "DEFAULT REPO",
-    "auth": "basic",
-    "username": "GITHUB USERNAME",
-    "password": "GITHUB PASSWORD"
+    "auth": "token",
+    "accessToken": "Get your token here: https://help.github.com/articles/creating-an-access-token-for-command-line-use/"
   }
 }
