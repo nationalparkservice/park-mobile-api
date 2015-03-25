@@ -55,7 +55,7 @@ module.exports = function(req, res) {
       .catch(function(result) {
         errorLog('a4');
         deleteImages(result);
-        res.send('Error: ' + result.error);
+        res.send('Error: ' + result.splice(-1,1).error);
       });
 
   } else {
