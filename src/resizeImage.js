@@ -4,7 +4,7 @@ var Bluebird = require('bluebird'),
 
 module.exports = function(filePath, uuid, type) {
   return new Bluebird(function(fulfill, reject) {
-    console.log('a12');
+    console.log('b1');
     // TODO: Better temp output filenames!
     var args = {
       'f': filePath,
@@ -17,12 +17,15 @@ module.exports = function(filePath, uuid, type) {
         args.error = e;
         args.result = r;
         if (e) {
+          console.log('b2');
           reject(args);
         } else {
+          console.log('b3');
           fulfill(args);
         }
       });
     } catch (err) {
+      console.log('b4');
       args.error = err;
       reject(args);
     }
