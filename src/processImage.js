@@ -2,7 +2,8 @@ var createUuid = require('./createUuid'),
   datawrap = require('datawrap'),
   deleteImages = require('./deleteImages'),
   resizeImage = require('./resizeImage'),
-  runList = datawrap.runList;
+  runList = datawrap.runList,
+  writeImages = require('./writeImages');
 
 module.exports = function(req, res) {
   // Default these to null if they're empty
@@ -11,12 +12,18 @@ module.exports = function(req, res) {
 
   var field = 'userPhoto',
     file = {},
+    githubSettings = {
+      'account': req.body.githubAccount,
+      'branch': req.body.githubBranch,
+      'repo': req.body.githubRepo,
+      'path': req.body.githubPath,
+    },
     taskList = [],
     uuid = req.body.uuid || createUuid(req.body.uuidPattern);
   console.log(req.body);
   if (req.files[field]) {
     file = req.files[field];
-    console.log('Now we can transform the data ');
+    console.log('a0');
 
     // First we make a list of everything that needs to be resized
     req.body.types.map(function(type) {
@@ -32,8 +39,15 @@ module.exports = function(req, res) {
     runList(taskList, 'resize images')
       .then(function(result) {
         console.log('a1');
-        deleteImages(result);
-        res.send('good');
+        writeImages(result, githubSettings)
+          .then(function() {
+            deleteImages(result);
+            res.send('good');
+          })
+          .catch(function(e) {
+            deleteImages(result);
+            res.send('Error: ' + e);
+          });
       })
       .catch(function(result) {
         console.log('a4');
