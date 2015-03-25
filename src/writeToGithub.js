@@ -1,6 +1,7 @@
 var Bluebird = require('bluebird'),
   btoa = require('btoa'),
   config = require('../config'),
+  errorLog = require('./errorLog'),
   fs = Bluebird.promisifyAll(require('fs')),
   moment = require('moment'),
   momentFormat = 'MMMM Do YYYY, h:mm:ss a',
@@ -19,7 +20,7 @@ var checkGithubFile = function(requestOptions) {
           sha: JSON.parse(responseBody).sha
         });
       } else {
-        reject('Unexpected http status: ' + response.statusCode);
+        reject('Unexpected http status on check: ' + response.statusCode);
       }
     });
   });
@@ -33,23 +34,24 @@ var writeGithubData = function(requestOptions, githubSettings, fileData, githubF
       sha: githubFile.sha,
       branch: githubSettings.branch,
       content: new Buffer(fileData).toString('base64'),
-      message: githubFile.createUpdate + ' ' + githubSettings.fileName + ' with ' + config.appName
+      message: githubFile.createUpdate + ' ' + requestOptions.url.split('/').splice(-1, 1) + ' with ' + config.appName
     };
     requestOptions.body = JSON.stringify(requestBody);
 
     request.put(requestOptions, function(error, response) {
       if (error) {
-        console.log('e2');
+        errorLog('e2');
         reject(error);
       } else {
         if (response.statusCode === 200 || response.statusCode === 201) {
           fulfill({
             githubSettings: githubSettings,
-            message: moment().format(momentFormat) + ': ' + githubSettings.relativePath + '/' +  requestOptions.url.splice(-1,1) + ' updated and committed/pushed to GitHub',
+            message: moment().format(momentFormat) + ': ' + githubSettings.relativePath + '/' + requestOptions.url.split('/').splice(-1, 1) + ' updated and committed/pushed to GitHub',
             response: response
           });
         } else {
-          reject('Unexpected http status: ' + response.statusCode);
+          errorLog(response);
+          reject('Unexpected http status on write: ' + response.statusCode);
         }
       }
     });
@@ -76,7 +78,7 @@ var writeFile = function(localFileName, githubFileName, githubSettings) {
         'access_token': encodeURIComponent(config.github.accessToken)
       };
     } else {
-      console.log('e3');
+      errorLog('e3');
       reject('Authorization method ' + config.github.auth + ' is not supported');
     }
 
@@ -88,18 +90,18 @@ var writeFile = function(localFileName, githubFileName, githubSettings) {
             writeGithubData(requestOptions, githubSettings, fileData, githubFile)
               .then(fulfill)
               .catch(function(e) {
-                console.log('e4');
+                errorLog('e4');
                 reject(e);
               });
           })
           .catch(function(e) {
-            console.log('e5');
+            errorLog('e5');
             reject(e);
           });
       })
       .catch(
         function(e) {
-          console.log('e6');
+          errorLog('e6');
           reject(e);
         });
   });
@@ -117,7 +119,7 @@ module.exports = writeFile;
       repo: 'data',
       relativePath: '/places_mobile/klgo_legacy/media
     }).then(function(res) {
-      console.log(JSON.stringify(res, null, 2));
+      errorLog(JSON.stringify(res, null, 2));
     });
   }()
 );
