@@ -33,7 +33,7 @@ var writeGithubData = function(requestOptions, githubSettings, fileData, githubF
       sha: githubFile.sha,
       branch: githubSettings.branch || 'master',
       content: new Buffer(fileData).toString('base64'),
-      message: githubFile.createUpdate + ' ' + githubSettings.relativePath + ' with ' + config.appName
+      message: githubFile.createUpdate + ' ' + githubSettings.fileName + ' with ' + config.appName
     };
     requestOptions.body = JSON.stringify(requestBody);
 
@@ -45,7 +45,7 @@ var writeGithubData = function(requestOptions, githubSettings, fileData, githubF
         if (response.statusCode === 200 || response.statusCode === 201) {
           fulfill({
             githubSettings: githubSettings,
-            message: moment().format(momentFormat) + ': ' + githubSettings.relativePath + ' updated and committed/pushed to GitHub',
+            message: moment().format(momentFormat) + ': ' + githubSettings.relativePath + '/' +  requestOptions.url.splice(-1,1) + ' updated and committed/pushed to GitHub',
             response: response
           });
         } else {
@@ -57,11 +57,11 @@ var writeGithubData = function(requestOptions, githubSettings, fileData, githubF
 };
 
 
-var writeFile = function(localFile, githubSettings) {
+var writeFile = function(localFileName, githubFileName, githubSettings) {
   return new Bluebird(function(fulfill, reject) {
     // Generate the headers
     var requestOptions = {
-      url: 'https://api.github.com/repos/' + githubSettings.account + '/' + githubSettings.repo + '/contents' + githubSettings.relativePath,
+      url: 'https://api.github.com/repos/' + githubSettings.account + '/' + githubSettings.repo + '/contents' + githubSettings.relativePath + '/' + githubFileName,
       timeout: 30000,
       headers: {
         'User-Agent': config.appName
@@ -81,7 +81,7 @@ var writeFile = function(localFile, githubSettings) {
     }
 
     // Read the file (using sync, because if it doesn't work, there's no reason to make a request, especially since we are rate limited)
-    fs.readFileAsync(localFile)
+    fs.readFileAsync(localFileName)
       .then(function(fileData) {
         checkGithubFile(requestOptions)
           .then(function(githubFile) {
@@ -111,11 +111,11 @@ module.exports = writeFile;
 /*
 (
   function() {
-    writeFile('./test.jpg', {
+    writeFile('./test.jpg', 'test.jpg', {
       account: 'nationalparkservice',
       branch: 'gh-pages',
       repo: 'data',
-      relativePath: '/places_mobile/klgo_legacy/media/test.jpg'
+      relativePath: '/places_mobile/klgo_legacy/media
     }).then(function(res) {
       console.log(JSON.stringify(res, null, 2));
     });
