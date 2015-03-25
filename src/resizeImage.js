@@ -18,7 +18,7 @@ module.exports = function(filePath, uuid, type) {
         args.error = e;
         args.result = r;
         if (e) {
-          errorLog('b2');
+          errorLog('b2', e);
           reject(args);
         } else {
           errorLog('b3');
