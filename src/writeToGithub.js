@@ -31,7 +31,7 @@ var writeGithubData = function(requestOptions, githubSettings, fileData, githubF
   return new Bluebird(function(fulfill, reject) {
     var requestBody = {
       sha: githubFile.sha,
-      branch: githubSettings.branch || 'master',
+      branch: githubSettings.branch,
       content: new Buffer(fileData).toString('base64'),
       message: githubFile.createUpdate + ' ' + githubSettings.fileName + ' with ' + config.appName
     };
