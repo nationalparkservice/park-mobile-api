@@ -28,7 +28,8 @@ module.exports = function(req, res) {
     errorLog('a0');
 
     // First we make a list of everything that needs to be resized
-    req.body.types.map(function(type) {
+
+    [].concat(req.body.types).map(function(type) {
       errorLog('a6');
       taskList.push({
         'name': 'Resizing to ' + type,
