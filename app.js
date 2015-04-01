@@ -1,16 +1,17 @@
-var express = require('express'),
-  htmlRoot = __dirname + '/html/',
-  imageMulter = require('./src/imageMulter'),
-  port = 3001,
-  processImage = require('./src/processImage');
+var Api = require('./src/api'),
+  config = require('./config'),
+  express = require('express'),
+  port = 3001;
 
-var app = express();
+var app = express(),
+  api = new Api(config),
+  apiRouter = express.Router();
 
-app.get('/', function(req, res) {
-  res.sendFile(htmlRoot + 'index.html');
+api(config).map(function(apiCall) {
+  apiRouter[apiCall.method]('/api' + apiCall.path, apiCall.process);
 });
 
-app.post('/api/photo', [imageMulter, processImage]);
+app.use(apiRouter);
 
 app.listen(port, function() {
   console.log('Working on port ' + port);
