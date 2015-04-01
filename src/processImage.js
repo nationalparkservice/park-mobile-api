@@ -21,7 +21,7 @@ module.exports = function(req, res) {
       'relativePath': req.body.path
     },
     taskList = [],
-    uuid = req.body.uuid || createUuid(req.body.uuidPattern);
+    uuid = req.params.imageId || req.body.uuid || createUuid(req.body.uuidPattern);
   errorLog(req.body);
   if (req.files[field]) {
     file = req.files[field];
