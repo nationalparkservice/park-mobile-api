@@ -12,6 +12,15 @@
         res.sendFile(config.htmlDirectory + '/index.html');
       }
     }, {
+      'name': 'GET update park json',
+      'description': 'Returns json describing if the latest updates are correct',
+      'method': 'GET',
+      'path': '/update/:unitCode',
+      'process': function(req, res) {
+        // TODO: Move the park script here
+        return ([req, res]);
+      }
+    }, {
       'name': 'POST image',
       'description': 'Accepts an image file, resizes it, uploads it to a server, Returns image Id',
       'method': 'POST',
