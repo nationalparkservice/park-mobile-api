@@ -8,7 +8,8 @@
       'method': 'GET',
       'path': '/',
       'process': function(req, res) {
-        res.sendFile(__dirname + '/' + config.htmlRoot + 'index.html');
+        console.log(__dirname, config.htmlRoot);
+        res.sendFile(config.htmlDirectory + '/index.html');
       }
     }, {
       'name': 'POST image',
