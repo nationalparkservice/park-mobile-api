@@ -7,8 +7,10 @@ var app = express(),
   api = new Api(config),
   apiRouter = express.Router();
 
-api(config).map(function(apiCall) {
-  apiRouter[apiCall.method]('/api' + apiCall.path, apiCall.process);
+config.htmlDirectory = __dirname + '/' + config.htmlDirectory;
+
+api.map(function(apiCall) {
+  apiRouter[apiCall.method.toLowerCase()]('/api' + apiCall.path, apiCall.process);
 });
 
 app.use(apiRouter);
