@@ -8,17 +8,7 @@
       'method': 'GET',
       'path': '/',
       'process': function(req, res) {
-        console.log(__dirname, config.htmlRoot);
         res.sendFile(config.htmlDirectory + '/index.html');
-      }
-    }, {
-      'name': 'GET update park json',
-      'description': 'Returns json describing if the latest updates are correct',
-      'method': 'GET',
-      'path': '/update/:unitCode',
-      'process': function(req, res) {
-        // TODO: Move the park script here
-        return ([req, res]);
       }
     }, {
       'name': 'POST image',
