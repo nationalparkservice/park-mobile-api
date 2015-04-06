@@ -45,17 +45,17 @@ module.exports = function(req, res) {
         writeImages(result, githubSettings)
           .then(function() {
             deleteImages(result);
-            res.send('good');
+            res.send(uuid);
           })
           .catch(function(e) {
             deleteImages(result);
-            res.send('Error: ' + e);
+            res.send('Error: ' + e.splice(-1, 1));
           });
       })
       .catch(function(result) {
         errorLog('a4');
         deleteImages(result);
-        res.send('Error: ' + result.splice(-1,1).error);
+        res.send('Error: ' + result.splice(-1, 1).error);
       });
 
   } else {
