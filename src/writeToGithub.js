@@ -26,9 +26,36 @@ var checkGithubFile = function(requestOptions) {
   });
 };
 
+var deleteGithubData = function(requestOptions, githubSettings, githubFile) {
+  return new Bluebird(function(fulfill, reject) {
+    var requestBody = {
+      sha: githubFile.sha,
+      branch: githubSettings.branch,
+      message: 'Removing ' + requestOptions.url.split('/').splice(-1, 1) + ' with ' + config.appName
+    };
+    requestOptions.body = JSON.stringify(requestBody);
+
+    request.del(requestOptions, function(error, response) {
+      if (error) {
+        errorLog('ed0');
+        reject(error);
+      } else {
+        if (response.statusCode === 200 || response.statusCode === 201) {
+          fulfill({
+            githubSettings: githubSettings,
+            message: moment().format(momentFormat) + ': ' + githubSettings.relativePath + '/' + requestOptions.url.split('/').splice(-1, 1) + ' removed/pushed to GitHub',
+            response: response
+          });
+        } else {
+          errorLog(response);
+          reject('Unexpected http status on delete: ' + response.statusCode);
+        }
+      }
+    });
+  });
+};
 
 var writeGithubData = function(requestOptions, githubSettings, fileData, githubFile) {
-
   return new Bluebird(function(fulfill, reject) {
     var requestBody = {
       sha: githubFile.sha,
@@ -58,7 +85,6 @@ var writeGithubData = function(requestOptions, githubSettings, fileData, githubF
   });
 };
 
-
 var writeFile = function(localFileName, githubFileName, githubSettings) {
   return new Bluebird(function(fulfill, reject) {
     // Generate the headers
@@ -82,26 +108,36 @@ var writeFile = function(localFileName, githubFileName, githubSettings) {
       reject('Authorization method ' + config.github.auth + ' is not supported');
     }
 
+    var uploadFile = function(fileData) {
+      checkGithubFile(requestOptions)
+        .then(function(githubFile) {
+          if (config.github.disabled) {
+            fulfill({});
+          } else if (localFileName) {
+            writeGithubData(requestOptions, githubSettings, fileData, githubFile)
+              .then(fulfill)
+              .catch(function(e) {
+                errorLog('e4');
+                reject(e);
+              });
+          } else if (!localFileName) {
+            // If not filename is passed in, we delete the file from github
+            deleteGithubData(requestOptions, githubSettings, githubFile)
+              .then(fulfill)
+              .catch(reject);
+          }
+        })
+        .catch(function(e) {
+          errorLog('e5');
+          reject(e);
+        });
+    };
+
+
     // Read the file (using sync, because if it doesn't work, there's no reason to make a request, especially since we are rate limited)
     fs.readFileAsync(localFileName)
       .then(function(fileData) {
-        checkGithubFile(requestOptions)
-          .then(function(githubFile) {
-            if (config.github.disabled) {
-              fulfill({});
-            } else {
-              writeGithubData(requestOptions, githubSettings, fileData, githubFile)
-                .then(fulfill)
-                .catch(function(e) {
-                  errorLog('e4');
-                  reject(e);
-                });
-            }
-          })
-          .catch(function(e) {
-            errorLog('e5');
-            reject(e);
-          });
+        uploadFile(fileData);
       })
       .catch(
         function(e) {
