@@ -3,6 +3,7 @@ var config = require('../config'),
   datawrap = require('datawrap'),
   deleteImages = require('./cleanup'),
   errorLog = require('./errorLog'),
+  removeFile = require('./github/remove'),
   resizeImage = require('./resizeImage'),
   runList = datawrap.runList,
   writeImages = require('./writeImages');
@@ -18,17 +19,21 @@ module.exports = function(req, res) {
       'account': (req.body.githubAccount || config.github.account),
       'branch': (req.body.githubBranch || config.github.branch),
       'repo': (req.body.githubRepo || config.github.repo),
-      'relativePath': req.body.path
+      'relativePath': req.body.path,
+      'auth': config.github.auth,
+      'accessToken': config.github.accessToken,
+      'username': config.github.username,
+      'password': config.github.password
     },
     taskList = [],
     uuid = req.params.imageId || req.body.uuid || createUuid(req.body.uuidPattern);
   errorLog(req.body);
-  if (req.files[field]) {
+
+  if (req.files[field] && (req.method !== 'DELETE' || req.body.del === 'DELETE')) {
     file = req.files[field];
     errorLog('a0');
 
     // First we make a list of everything that needs to be resized
-
     [].concat(req.body.types).map(function(type) {
       errorLog('a6');
       taskList.push({
@@ -42,7 +47,7 @@ module.exports = function(req, res) {
     runList(taskList, 'resize images')
       .then(function(result) {
         errorLog('a1');
-        writeImages(result, githubSettings)
+        writeImages(result, githubSettings, config)
           .then(function() {
             deleteImages(result);
             res.send(uuid);
@@ -58,8 +63,32 @@ module.exports = function(req, res) {
         res.send('Error: ' + result.splice(-1, 1).error);
       });
 
-  } else {
-    errorLog('a4');
-    res.send('No file uploaded');
+  } else if (req.method !== 'DELETE' || req.body.del === 'DELETE') {
+    // Create a list of the probable filenames
+    if (req.body.uuid) {
+      [].concat(req.body.types).map(function(type) {
+        ['jpg', 'png', 'JPG', 'PNG'].map(function(fileType) {
+          taskList.push(req.body.uuid + '_' + type + '.' + fileType);
+        });
+      });
+
+      taskList = taskList.map(function(task) {
+        return {
+          'name': 'Removing ' + task,
+          'task': removeFile,
+          'params': [githubSettings.relativePath + '/' + task, githubSettings, config]
+        };
+      });
+      // Then we actually remove then all
+      runList(taskList, 'remove images')
+        .then(function() {
+          res.send(uuid);
+        })
+        .catch(function(e) {
+          res.send('Error: ' + e);
+        });
+    } else {
+      res.send('Error: uuid required for deletion');
+    }
   }
 };
