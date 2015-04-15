@@ -46,9 +46,9 @@ module.exports = {
       };
     }
   },
-  readFile: function(filename) {
+  readFile: function(filename, encoding) {
     return new Bluebird(function(fulfill, reject) {
-      fs.readFileAsync(filename)
+      fs.readFileAsync(filename, encoding)
         .catch(reject)
         .then(fulfill);
     });

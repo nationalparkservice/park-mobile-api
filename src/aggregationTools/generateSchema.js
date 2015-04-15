@@ -1,135 +1,154 @@
-// Requires
-var datawrap = require('datawrap');
-var readFile = require('../github/githubFunctions.js').readFile;
-var request = require('request');
+var Bluebird = require('bluebird');
 
-// Tools
-var Bluebird = datawrap.Bluebird;
-var runList = datawrap.runList;
-
-var readSchemaFile = function(options) {
-  return new Bluebird(function(fulfill, reject) {
-    // Read the Schema File
-    if (options.schema) {
-      readFile(options.schema)
-        .catch(reject)
-        .then(fulfill);
-    } else {
-      reject('No schema');
-    }
-  });
-};
-
-var readTypes = {
-  'http': {
-    'cartodb': function(schemaPart, unitCode) {
-      return new Bluebird(function(fulfill, resolve) {
-
-        var buildSql = function(source) {
-          var sqlParts = {},
-            sqlString = 'SELECT {{fields}} FROM {{table}} WHERE {{where}}{{extras}}',
-            getFields = function(props) {
-              // Get the fields from the schema
-              var newFields = [];
-              for (var property in props) {
-                if (!props[property].transformation || props[property].transformation === 'StringToArray') {
-                  if (!props[property].noColumn) {
-                    newFields.push('"' + (props[property].alias || property) + '"');
-                  }
-                }
-              }
-              return newFields;
-            };
-
-          // Fields
-          sqlParts.properties = schemaPart.items ? schemaPart.items.properties : schemaPart.properties;
-          if (sqlParts.properties) {
-            if (!sqlParts.fields.length) {
-              sqlParts.fields = getFields(sqlParts.properties);
-            } else if (sqlParts.fields.indexOf('*') > -1) {
-              sqlParts.fields = sqlParts.fields.filter(function(f) {
-                return f !== '*';
-              });
-              sqlParts.fields = sqlParts.fields.concat(getFields(sqlParts.properties));
-            }
+var tools = {
+  format: {
+    toArray: function(value) {
+      return Array.isArray(value) ? value : [value];
+    },
+    number: function(value) {
+      return isNaN(value) ? value : parseFloat(value, 10);
+    },
+    value: function(value, types, transformation, schemaPart, data) {
+      var returnValue, tempValue;
+      if ((!value || value === '') && types.indexOf('null') > -1) {
+        returnValue = null;
+      } else if (types[0] === 'number') {
+        returnValue = tools.format.number(value);
+      } else if (types[0] === 'array' && transformation && value) {
+        if (transformation === 'StringToArray') {
+          tempValue = value.replace(/^\[|\]$/g, '').split(',');
+          returnValue = [];
+          if (schemaPart.source) {
+            //Map the values to the source
+            returnValue = tools.read.rows(schemaPart, data, {
+              'field': schemaPart.key || 'id',
+              'values': tempValue
+            });
+          } else {
+            tempValue.map(function(v) {
+              returnValue.push(tools.format.number(v));
+            });
           }
+        } else {
+          returnValue = 'ARRAY COMING SOON';
+        }
+      } else {
+        returnValue = value;
+      }
+      return returnValue;
+    }
+  },
+  readValue: function(value, types, transformation, schemaPart, data) {
+    var returnValue, tempValue;
+    if ((!value || value === '') && types.indexOf('null') > -1) {
+      returnValue = null;
+    } else if (types[0] === 'number') {
+      returnValue = tools.format.number(value);
+    } else if (types[0] === 'array' && transformation && value) {
+      if (transformation === 'StringToArray') {
+        tempValue = value.replace(/^\[|\]$/g, '').split(',');
+        returnValue = [];
+        if (schemaPart.source) {
+          //Map the values to the source
+          returnValue = tools.read.rows(schemaPart, data, {
+            'field': schemaPart.key || 'id',
+            'values': tempValue
+          });
+        } else {
+          tempValue.map(function(v) {
+            returnValue.push(tools.format.number(v));
+          });
+        }
+      } else {
+        returnValue = 'ARRAY COMING SOON';
+      }
+    } else {
+      returnValue = value;
+    }
 
-          // Assign values from schemaPart
-
-
-          return source;
-        };
+    return returnValue;
+  },
+  read: {
+    schema: function(schemaPart, data, depth) {
+      console.log(tools.format.toArray(schemaPart.type));
+      depth += 1; // Mostly for debugging
+      var part,
+        type = tools.format.toArray(schemaPart.type),
+        field;
+      if (type.indexOf('object') > -1) {
+        part = {};
+        for (field in schemaPart.properties) {
+          if (schemaPart.properties[field].type.indexOf('object') > -1 || schemaPart.properties[field].type.indexOf('array') > -1) {
+            part[field] = tools.read.schema(schemaPart.properties[field], data, depth);
+          } else {
+            part[field] = tools.read.value(schemaPart, data, field, null);
+          }
+        }
+      } else if (type.indexOf('array') > -1) {
+        // This will loop through the json file
+        if (schemaPart.source) {
+          part = tools.read.rows(schemaPart, data, null);
+        }
+      } else {
+        // This condition should never occur
+        part = 'FIXME'; //tools.format.toArray(schemaPart.type)[0];
+      }
+      return part;
+    },
+    rows: function(schemaPart, data, filterBy) {
+      var rows = [],
+        jsonFile = data.filter(function(d) {
+          return d.path === schemaPart.source.path && d.format === schemaPart.source.format;
+        })[0].data;
+      // Filter out the values required for this step
+      if (filterBy) {
+        jsonFile = jsonFile.filter(function(d) {
+          return filterBy.values.indexOf(d[filterBy.field].toString()) > -1;
+        });
+        var temp = [];
+        // Set the order for the data (this is done after the filter because it needs to loop through far less items)
+        filterBy.values.map(function(id) {
+          jsonFile.map(function(d) {
+            if (d[filterBy.field].toString() === id) temp.push(d);
+          });
+        });
+        jsonFile = temp;
+      }
+      jsonFile.map(function(record) {
+        var row = {},
+          alias,
+          field,
+          properties = schemaPart.items ? schemaPart.items.properties : schemaPart.properties;
+        for (field in properties) {
+          alias = properties[field].alias || field;
+          row[field] = tools.format.value(record[alias], properties[field].type, properties[field].transformation, properties[field], data);
+        }
+        // Allow the option to only have one value in the object
+        if (schemaPart.items && schemaPart.items.transformation === 'value') {
+          row = row[field];
+        }
+        rows.push(row);
       });
+      return rows;
+    },
+    value: function(schemaPart, data, value, filterBy) {
+      var returnValue = null,
+        tryRows = tools.read.rows(schemaPart, data, filterBy);
+      if (tryRows && tryRows[0] && tryRows[0][value]) {
+        returnValue = tryRows[0][value];
+      }
+      return returnValue;
     }
   }
 };
-
-var readSource = function(schemaPart, unitCode) {
-  var sourceInfo = schemaPart.source,
-    format = sourceInfo.format,
-    metadata = sourceInfo.metadata,
-    path = sourceInfo.path,
-    type = sourceInfo.type;
-
+module.exports = function(schemaFile, parkData) {
   return new Bluebird(function(fulfill, reject) {
-    if (readTypes[type] && readTypes[type][format]) {
-      readTypes[type][format](path, sourceInfo, unitCode, schemaPart)
-        .catch(reject)
-        .then(function(a) {
-          console.log(a, metadata);
-          // tools.read.returnJson(path, format, metadata)
-        });
-    } else {
-      reject('Invalid type (' + type + ') or format: (' + format + ')');
+    var returnValue = {};
+    try {
+      returnValue = tools.read.schema(schemaFile, parkData, 0);
+      fulfill(returnValue);
+    } catch (e) {
+      reject(e);
     }
-
-  });
-};
-
-var readSchema = function(schema, unitCode) {
-  var taskList = [];
-  var getData = function(schemaPart) {
-    var field;
-    if (schemaPart.source && typeof(schemaPart.source) === 'object' && !Array.isArray(schemaPart.source)) {
-      // This schemaPart has a source
-      taskList.push({
-        'name': 'Getting a schemaPart',
-        'task': readSource,
-        'params': [schemaPart, unitCode]
-      });
-    }
-    if (schemaPart.properties && typeof(schemaPart.properties) === 'object' && !Array.isArray(schemaPart.properties)) {
-      // Properties list, start a recursive function
-      for (field in schemaPart.properties) {
-        getData(schemaPart.properties[field]);
-      }
-    }
-    if (schemaPart.items && schemaPart.items.properties) {
-      getData(schemaPart.items);
-    }
-  };
-
-  return new Bluebird(function(fulfill, reject) {
-    // Build the taskList
-    getData(schema);
-
-    runList(taskList)
-      .catch(reject)
-      .then(fulfill);
-  });
-};
-
-module.exports = function(options, unitCode) {
-  return new Bluebird(function(fulfill, reject) {
-    // Read the Schema File
-    readSchemaFile(options.schema)
-      .catch(reject)
-      .then(function(schema) {
-        readSchema(schema, unitCode)
-          .catch(reject)
-          .then(function(schemaData) {
-            console.log(schemaData);
-          });
-      });
   });
 };
