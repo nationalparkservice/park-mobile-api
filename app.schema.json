@@ -1,0 +1,890 @@
+{
+  "api_version": "0.1.3",
+  "description": "Associates a park with its attributes",
+  "title": "Park app.json",
+  "source": {
+    "format": "cartodb",
+    "path": "places_mobile_parks",
+    "sql": {
+      "orderby": "",
+      "table": "places_mobile_parks",
+      "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+      "where": ""
+    },
+    "type": "http"
+  },
+  "type": ["object"],
+  "properties": {
+    "alerts": {
+      "description": "Alerts for this park",
+      "source": {
+        "format": "cartodb",
+        "path": "places_mobile_more_alerts",
+        "sql": {
+          "orderby": "",
+          "table": "places_mobile_more_alerts",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "type": ["array"],
+      "items": {
+        "type": ["object", "null"],
+        "properties": {
+          "description": {
+            "description": "Description for the alert",
+            "type": ["string", "null"]
+          },
+          "name": {
+            "description": "Name of the alert",
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+    "categories": {
+      "description": "Categories that are associated with the sites",
+      "source": {
+        "format": "cartodb",
+        "path": "places_mobile_categories",
+        "sql": {
+          "orderby": "display_order",
+          "table": "places_mobile_categories",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "type": ["array"],
+      "items": {
+        "type": ["object", "null"],
+        "properties": {
+          "description": {
+            "description": "Description of the category",
+            "type": ["string", "null"]
+          },
+          "name": {
+            "description": "The name of the category",
+            "type": ["string", "null"]
+          },
+          "sites": {
+            "description": "The id of the sites that are included in this category",
+            "transformation": "StringToArray",
+            "type": ["array", "null"],
+            "items": {
+              "type": ["number", "null"]
+            }
+          }
+        }
+      }
+    },
+    "description": {
+      "description": "Description of the park",
+      "type": ["string"]
+    },
+    "designation": {
+      "description": "Denotes which type of park unit this park is",
+      "type": ["string"]
+    },
+    "events": {
+      "description": "Events that are held in the park",
+      "source": {
+        "format": "cartodb",
+        "path": "places_mobile_events",
+        "sql": {
+          "orderby": "",
+          "table": "places_mobile_events",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "type": ["array"],
+      "items": {
+        "description": "Individual Event",
+        "type": ["object", "null"],
+        "properties": {
+          "dates": {
+            "description": "The date in text ISO-8601 format (ex. 2014-09-05T10:00:15Z)",
+            "transformation": "StringToArray",
+            "type": ["array", "null"],
+            "items": {
+              "type": ["string", "null"]
+            }
+          },
+          "description": {
+            "description": "Description of the event",
+            "type": ["string", "null"]
+          },
+          "frequency": {
+            "description": "Frequency of the event",
+            "type": ["string", "null"]
+          },
+          "home_description": {
+            "description": "Description of the event that is displayed on the home screen",
+            "type": ["string", "null"]
+          },
+          "name": {
+            "description": "Name of the event",
+            "type": ["string", "null"]
+          },
+          "site_id": {
+            "description": "Name of the site for the event",
+            "type": ["string", "null"]
+          },
+          "title": {
+            "description": "Title of the event",
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+    "kiosk_media": {
+      "description": "Media that displays in a part of the app called a kiosk",
+      "transformation": "StringToArray",
+      "type": ["array"],
+      "items": {
+        "type": ["number", "null"]
+      }
+    },
+    "map_thumbnail_zoom": {
+      "description": "The zoom level used for the thumbnail images",
+      "type": ["number"]
+    },
+    "max_distance_in_meters": {
+      "description": "Max distance for nearby searches",
+      "type": ["number"]
+    },
+    "media": {
+      "description": "Links to images and videos for use in the app",
+      "type": ["array"],
+      "source": {
+        "metadata": {
+          "images": {
+            "originalPath": "original_url",
+            "linkedTable": "sites",
+            "media": "type"
+          }
+        },
+        "format": "cartodb",
+        "path": "places_mobile_media",
+        "sql": {
+          "fields": ["\"original_url\"", "*"],
+          "orderby": "",
+          "table": "places_mobile_media",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "items": {
+        "description": "Individual image, video, or sound",
+        "type": ["object", "null"],
+        "properties": {
+          "alt": {
+            "description": "Alt text",
+            "type": ["string", "null"]
+          },
+          "caption": {
+            "description": "Caption for the media",
+            "type": ["string", "null"]
+          },
+          "first_image": {
+            "description": "First image for the then and now types",
+            "type": ["number", "null"]
+          },
+          "id": {
+            "alias": "cartodb_id",
+            "description": "id used to reference the media",
+            "type": ["number", "null"]
+          },
+          "image_1080": {
+            "description": "Name for image (size 1080)",
+            "type": ["string", "null"]
+          },
+          "image_1536": {
+            "description": "Name for image (size 1535)",
+            "type": ["string", "null"]
+          },
+          "image_350": {
+            "description": "Name for image (size 350)",
+            "type": ["string", "null"]
+          },
+          "image_480": {
+            "description": "Name for image (size 480)",
+            "type": ["string", "null"]
+          },
+          "image_640": {
+            "description": "Name for image (size 640)",
+            "type": ["string", "null"]
+          },
+          "image_768": {
+            "description": "Name for image (size 768)",
+            "type": ["string", "null"]
+          },
+          "image_960": {
+            "description": "Name for image (size 960)",
+            "type": ["string", "null"]
+          },
+          "image_thumbnail_1x": {
+            "description": "Name for image (size thumbnail 1x)",
+            "type": ["string", "null"]
+          },
+          "image_thumbnail_2x": {
+            "description": "Name for image (size thumbnail 2x)",
+            "type": ["string", "null"]
+          },
+          "image_thumbnail_3x": {
+            "description": "Name for image (size thumbnail 3x)",
+            "type": ["string", "null"]
+          },
+          "name": {
+            "description": "Name for the media",
+            "type": ["string", "null"]
+          },
+          "relative_url": {
+            "description": "url to the media",
+            "type": ["string", "null"]
+          },
+          "relative_url_@2x": {
+            "alias": "relative_url_2x",
+            "description": "url to the media for retina",
+            "type": ["string", "null"]
+          },
+          "relative_url_tablet": {
+            "description": "url to the media for tablets",
+            "type": ["string", "null"]
+          },
+          "relative_url_tablet_@2x": {
+            "alias": "relative_url_tablet_2x",
+            "description": "url to the media for retina tablets",
+            "type": ["string", "null"]
+          },
+          "second_image": {
+            "description": "Second Image for then and now",
+            "type": ["number", "null"]
+          },
+          "thumbnail_image": {
+            "description": "thumbnail for the media",
+            "type": ["number", "null"]
+          },
+          "transcript": {
+            "description": "Transcript of the media",
+            "type": ["string", "null"]
+          },
+          "type": {
+            "description": "The type of media",
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+    "more": {
+      "description": "Values for the 'more' section of the app",
+      "source": {
+        "format": "cartodb",
+        "path": "places_mobile_more",
+        "sql": {
+          "orderby": "disp_order",
+          "table": "places_mobile_more",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "type": ["array"],
+      "items": {
+        "type": ["object"],
+        "properties": {
+          "description": {
+            "description": "Description of the more field",
+            "type": ["string", "null"]
+          },
+          "disp_order": {
+            "description": "Display Order of the more field",
+            "type": ["number", "null"]
+          },
+          "icon": {
+            "description": "Select a special icon if it wasn't embedded at the app build",
+            "type": ["number", "null"]
+          },
+          "is_feature": {
+            "description": "If this more entry is a feature",
+            "type": ["boolean", "null"]
+          },
+          "name": {
+            "description": "Name of the more field",
+            "type": ["string", "null"]
+          },
+          "type": {
+            "description": "The type of more",
+            "type": ["string", "null"]
+          },
+          "pages": {
+            "description": "the page(s) associated with this entry",
+            "source": {
+              "format": "cartodb",
+              "path": "places_mobile_more_pages",
+              "sql": {
+                "orderby": "",
+                "table": "places_mobile_more_pages",
+                "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                "where": ""
+              },
+              "type": "http"
+            },
+            "transformation": "StringToArray",
+            "key": "cartodb_id",
+            "type": ["array", "null"],
+            "items": {
+              "description": "Data from the page(s)",
+              "type": ["object", "null"],
+              "properties": {
+                "audio_description": {
+                  "description": "This is where the audio_description will be displayed",
+                  "type": ["string", "null"]
+                },
+                "description": {
+                  "description": "this is where the description will be displayed",
+                  "type": ["string", "null"]
+                },
+                "faq_subsections": {
+                  "description": "Questions in this section",
+                  "source": {
+                    "format": "cartodb",
+                    "path": "places_mobile_faqs_questions",
+                    "sql": {
+                      "orderby": "",
+                      "table": "places_mobile_faqs_questions",
+                      "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                      "where": ""
+                    },
+                    "type": "http"
+                  },
+                  "transformation": "StringToArray",
+                  "key": "cartodb_id",
+                  "type": ["array", "null"],
+                  "items": {
+                    "description": "Individual Q/A Pair",
+                    "type": ["object", "null"],
+                    "properties": {
+                      "question": {
+                        "description": "The question field",
+                        "type": ["string", "null"]
+                      },
+                      "answer": {
+                        "description": "The answer field",
+                        "type": ["string", "null"]
+                      }
+                    }
+                  }
+                },
+                "header": {
+                  "description": "this is where the header will be displayed",
+                  "type": ["string", "null"]
+                },
+                "image_position": {
+                  "description": "this is where the image_position will be displayed",
+                  "type": ["string", "null"]
+                },
+                "media": {
+                  "description": "Links to the image in the media section",
+                  "transformation": "StringToArray",
+                  "type": ["array", "null"],
+                  "items": {
+                    "type": ["number", "null"]
+                  }
+                },
+                "name": {
+                  "description": "this is where the name will be displayed",
+                  "type": ["string", "null"]
+                },
+                "subsections": {
+                  "description": "Allow subsections of pages",
+                  "source": {
+                    "format": "cartodb",
+                    "path": "places_mobile_more_pages",
+                    "sql": {
+                      "orderby": "",
+                      "table": "places_mobile_more_pages",
+                      "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                      "where": ""
+                    },
+                    "type": "http"
+                  },
+                  "transformation": "StringToArray",
+                  "key": "cartodb_id",
+                  "type": ["array", "null"],
+                  "items": {
+                    "description": "Data from the page(s)",
+                    "type": ["object", "null"],
+                    "properties": {
+                      "audio_description": {
+                        "description": "This is where the audio_description will be displayed",
+                        "type": ["string", "null"]
+                      },
+                      "description": {
+                        "description": "this is where the description will be displayed",
+                        "type": ["string", "null"]
+                      },
+                      "faq_subsections": {
+                        "description": "Questions in this section",
+                        "source": {
+                          "format": "cartodb",
+                          "path": "places_mobile_faqs_questions",
+                          "sql": {
+                            "orderby": "",
+                            "table": "places_mobile_faqs_questions",
+                            "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                            "where": ""
+                          },
+                          "type": "http"
+                        },
+                        "transformation": "StringToArray",
+                        "key": "cartodb_id",
+                        "type": ["array", "null"],
+                        "items": {
+                          "description": "Individual Q/A Pair",
+                          "type": ["object", "null"],
+                          "properties": {
+                            "question": {
+                              "description": "The question field",
+                              "type": ["string", "null"]
+                            },
+                            "answer": {
+                              "description": "The answer field",
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                      },
+                      "header": {
+                        "description": "this is where the header will be displayed",
+                        "type": ["string", "null"]
+                      },
+                      "image_position": {
+                        "description": "this is where the image_position will be displayed",
+                        "type": ["string", "null"]
+                      },
+                      "media": {
+                        "description": "Links to the image in the media section",
+                        "transformation": "StringToArray",
+                        "type": ["array", "null"],
+                        "items": {
+                          "type": ["number", "null"]
+                        }
+                      },
+                      "name": {
+                        "description": "this is where the name will be displayed",
+                        "type": ["string", "null"]
+                      },
+                      "subsections": {
+                        "description": "Allow subsections of pages",
+                        "source": {
+                          "format": "cartodb",
+                          "path": "places_mobile_more_pages",
+                          "sql": {
+                            "orderby": "",
+                            "table": "places_mobile_more_pages",
+                            "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                            "where": ""
+                          },
+                          "type": "http"
+                        },
+                        "transformation": "StringToArray",
+                        "key": "cartodb_id",
+                        "type": ["array", "null"],
+                        "items": {
+                          "description": "Data from the page(s)",
+                          "type": ["object", "null"],
+                          "properties": {
+                            "audio_description": {
+                              "description": "This is where the audio_description will be displayed",
+                              "type": ["string", "null"]
+                            },
+                            "description": {
+                              "description": "this is where the description will be displayed",
+                              "type": ["string", "null"]
+                            },
+                            "header": {
+                              "description": "this is where the header will be displayed",
+                              "type": ["string", "null"]
+                            },
+                            "image_position": {
+                              "description": "this is where the image_position will be displayed",
+                              "type": ["string", "null"]
+                            },
+                            "media": {
+                              "description": "Links to the image in the media section",
+                              "transformation": "StringToArray",
+                              "type": ["array", "null"],
+                              "items": {
+                                "type": ["number", "null"]
+                              }
+                            },
+                            "name": {
+                              "description": "this is where the name will be displayed",
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "name": {
+      "description": "Name of the Park",
+      "type": ["string"]
+    },
+    "overview_video": {
+      "description": "Index of a video that provides an overview of the park",
+      "type": ["number", "null"]
+    },
+    "searches": {
+      "description": "Predefined values for common searches",
+      "source": {
+        "format": "cartodb",
+        "path": "places_mobile_more_searches",
+        "sql": {
+          "orderby": "display_order",
+          "table": "places_mobile_more_searches",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "type": ["array", "null"],
+      "items": {
+        "transformation": "value",
+        "properties": {
+          "searches": {
+            "description": "The individual searches",
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+    "sites": {
+      "description": "Sites in this park",
+      "source": {
+        "format": "cartodb",
+        "metadata": {
+          "name": "sites"
+        },
+        "path": "places_mobile_sites",
+        "sql": {
+          "fields": ["*", "St_X(the_geom) AS longitude", "St_Y(the_geom) AS latitude"],
+          "orderby": "",
+          "table": "places_mobile_sites",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "type": ["array"],
+      "items": {
+        "type": ["object", "null"],
+        "properties": {
+          "audio_description": {
+            "description": "Description of the site in text for audio to be read",
+            "type": ["string", "null"]
+          },
+          "description": {
+            "description": "Description of the site",
+            "type": ["string", "null"]
+          },
+          "geofence_buffer_in_meters": {
+            "default": 10,
+            "description": "Distance for the geofence",
+            "type": ["number", "null"]
+          },
+          "id": {
+            "alias": "cartodb_id",
+            "description": "Key used to link with other fields",
+            "type": ["number", "null"]
+          },
+          "information": {
+            "source": {
+              "format": "cartodb",
+              "path": "places_mobile_information",
+              "sql": {
+                "orderby": "",
+                "table": "places_mobile_information",
+                "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                "where": ""
+              },
+              "type": "http"
+            },
+            "transformation": "StringToArray",
+            "key": "cartodb_id",
+            "type": ["array", "null"],
+            "items": {
+              "type": ["object", "null"],
+              "properties": {
+                "description": {
+                  "description": "Description of the information field",
+                  "type": ["string", "null"]
+                },
+                "name": {
+                  "description": "Name of the information field",
+                  "type": ["string", "null"]
+                }
+              }
+            }
+          },
+          "latitude": {
+            "noColumn": true,
+            "description": "latitude for the site",
+            "type": ["number", "null"]
+          },
+          "longitude": {
+            "noColumn": true,
+            "description": "longitude for the site",
+            "type": ["number", "null"]
+          },
+          "map_thumbnail_image": {
+            "description": "Link to the image in the media section",
+            "type": ["number", "null"]
+          },
+          "media": {
+            "description": "Links to the image in the media section",
+            "transformation": "StringToArray",
+            "type": ["array", "null"],
+            "items": {
+              "type": ["number", "null"]
+            }
+          },
+          "name": {
+            "description": "Name of the site",
+            "type": ["string", "null"]
+          },
+          "name_description": {
+            "description": "Short description of the site",
+            "type": ["string", "null"]
+          },
+          "primary_audio": {
+            "description": "Link to the main audio to be used for this site",
+            "type": ["number", "null"]
+          },
+          "primary_image": {
+            "description": "Link to the main image to be used for this site",
+            "type": ["number", "null"]
+          },
+          "type": {
+            "description": "Type of site (maybe this should be an enum?)",
+            "type": ["string", "null"]
+          },
+          "services": {
+            "description": "Services associated with this site",
+            "source": {
+              "format": "cartodb",
+              "path": "places_mobile_services",
+              "sql": {
+                "orderby": "",
+                "table": "places_mobile_services",
+                "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                "where": ""
+              },
+              "type": "http"
+            },
+            "transformation": "StringToArray",
+            "key": "cartodb_id",
+            "type": ["array", "null"],
+            "items": {
+              "type": ["object", "null"],
+              "properties": {
+                "description": {
+                  "description": "Description of the service",
+                  "type": ["string", "null"]
+                },
+                "icon": {
+                  "description": "Icon path associated with the service",
+                  "type": ["string", "null"]
+                },
+                "icon_@2x": {
+                  "alias": "icon_2x",
+                  "description": "Icon path associated with the service for retina",
+                  "type": ["string", "null"]
+                },
+                "type": {
+                  "description": "Type of service",
+                  "type": ["string", "null"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "states": {
+      "description": "Names of the states where the park is located",
+      "transformation": "StringToArray",
+      "type": ["array"],
+      "items": {
+        "type": ["string", "null"]
+      }
+    },
+    "tours": {
+      "description": "A list of tours in the park",
+      "source": {
+        "format": "cartodb",
+        "path": "places_mobile_tours",
+        "sql": {
+          "fields": ["*", "\"sites\" AS \"tours_sites\""],
+          "orderby": "",
+          "table": "places_mobile_tours",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "all",
+      "type": ["array"],
+      "items": {
+        "type": ["object", "null"],
+        "properties": {
+          "description": {
+            "description": "Short text about the tour",
+            "type": ["string", "null"]
+          },
+          "id": {
+            "alias": "cartodb_id",
+            "description": "id associated with the tour",
+            "type": ["number", "null"]
+          },
+          "name": {
+            "description": "Name of the tour",
+            "type": ["string", "null"]
+          },
+          "primary_image": {
+            "description": "image associated with the tour",
+            "type": ["number", "null"]
+          },
+          "sites": {
+            "description": "Sites associated with the tour and images for those sites",
+            "source": {
+              "format": "cartodb",
+              "path": "places_mobile_sites",
+              "sql": {
+                "orderby": "",
+                "table": "places_mobile_sites",
+                "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                "where": ""
+              },
+              "type": "http"
+            },
+            "transformation": "StringToArray",
+            "key": "cartodb_id",
+            "type": ["array", "null"],
+            "items": {
+              "type": ["object", "null"],
+              "properties": {
+                "id": {
+                  "alias": "cartodb_id",
+                  "description": "id that links to the site",
+                  "type": ["number", "null"]
+                },
+                "media": {
+                  "description": "id that links to the media",
+                  "transformation": "StringToArray",
+                  "type": ["array", "null"],
+                  "items": {
+                    "type": ["number", "null"]
+                  }
+                },
+                "primary_audio": {
+                  "description": "id that links to the corresponding main audio for this tour",
+                  "type": ["number", "null"]
+                }
+              }
+            }
+          },
+          "tours_sites": {
+            "noColumn": true,
+            "description": "Sites listed in the tour_sites table with extra tour information",
+            "source": {
+              "format": "cartodb",
+              "path": "places_mobile_tours_sites",
+              "sql": {
+                "orderby": "",
+                "table": "places_mobile_tours_sites",
+                "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+                "where": ""
+              },
+              "type": "http"
+            },
+            "transformation": "StringToArray",
+            "key": "site_id",
+            "type": ["array", "null"],
+            "items": {
+              "type": ["object", "null"],
+              "properties": {
+                "id": {
+                  "alias": "site_id",
+                  "description": "id that links to the site",
+                  "type": ["number", "null"]
+                },
+                "media": {
+                  "description": "id that links to the media",
+                  "transformation": "StringToArray",
+                  "type": ["array", "null"],
+                  "items": {
+                    "type": ["number", "null"]
+                  }
+                },
+                "primary_audio": {
+                  "description": "id that links to the corresponding main audio for this tour",
+                  "type": ["number", "null"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "urls": {
+      "description": "URLs used within the app",
+      "source": {
+        "metadata": {
+          "urls": "true"
+        },
+        "format": "cartodb",
+        "path": "places_mobile_urls",
+        "sql": {
+          "fields": ["*", "\"base_url_media_original\"", "\"base_local_media_original\""],
+          "orderby": "",
+          "table": "places_mobile_urls",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": ""
+        },
+        "type": "http"
+      },
+      "transformation": "first",
+      "type": ["object"],
+      "properties": {
+        "base_url_icon": {
+          "description": "The Base URL for icons",
+          "type": ["string"]
+        },
+        "base_url_media": {
+          "description": "The Base URL for all other media, resized for phone usage",
+          "type": ["string"]
+        }
+      }
+    }
+  }
+}
