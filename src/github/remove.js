@@ -8,7 +8,7 @@ module.exports = function(githubFileName, githubSettings, config) {
     githubFunctions.checkGithubFile(requestOptions)
       .catch(reject)
       .then(function(githubResponse) {
-        var message = 'Delete ' + requestOptions.url.split('/').splice(-1, 1) + ' with ' + config.appName;
+        var message = 'Delete ' + requestOptions.url.split('/').slice(-3).join('/').split('?')[0] + ' with ' + config.appName;
         if (githubResponse.statusCode === 404) {
           fulfill({
             'status': githubResponse.statusCode
