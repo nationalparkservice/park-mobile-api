@@ -4,7 +4,7 @@ var Bluebird = require('bluebird'),
   fs = require('fs'),
   runList = datawrap.runList,
   path = require('path'),
-  writeToGithub = require('./github/write');
+  writeFileToGithub = require('./github/writeFile');
 
 module.exports = function(imageList, githubSettings, config) {
   return new Bluebird(function(fulfill, reject) {
@@ -14,7 +14,7 @@ module.exports = function(imageList, githubSettings, config) {
       if (fs.existsSync(img.o)) {
         taskList.push({
           'name': 'Uploading ' + img.o + ' to github',
-          'task': writeToGithub,
+          'task': writeFileToGithub,
           'params': [img.o, githubSettings.relativePath + '/' + path.basename(img.o), githubSettings, config]
         });
       } else {
