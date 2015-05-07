@@ -1,3 +1,4 @@
+// B
 // Requires
 var datawrap = require('datawrap');
 var config = require('../../config');
@@ -36,7 +37,7 @@ var readTypes = {
         var buildSql = function() {
           var sqlParts = schemaPart.source.sql,
             sqlString = 'SELECT {{fields}} FROM {{table}} WHERE {{where}}{{extras}}',
-            getFields = function(props) {
+            getFields = function(props, fields) {
               // Get the fields from the schema
               var newFields = [];
               for (var property in props) {
@@ -46,20 +47,18 @@ var readTypes = {
                   }
                 }
               }
+              for (var field in fields) {
+                if (field !== '*') {
+                  newFields.push(field);
+                }
+              }
               return newFields;
             };
 
           // Fields
           sqlParts.properties = schemaPart.items ? schemaPart.items.properties : schemaPart.properties;
           if (sqlParts.properties) {
-            if (!(sqlParts.fields && !sqlParts.fields.length)) {
-              sqlParts.fields = getFields(sqlParts.properties);
-            } else if (sqlParts.fields.indexOf('*') > -1) {
-              sqlParts.fields = sqlParts.fields.filter(function(f) {
-                return f !== '*';
-              });
-              sqlParts.fields = sqlParts.fields.concat(getFields(sqlParts.properties));
-            }
+            sqlParts.fields = getFields(sqlParts.properties, sqlParts.fields || []);
           }
           if (schemaPart.key) sqlParts.fields.unshift(schemaPart.key);
 
