@@ -1,11 +1,11 @@
 /* Test Script */
 var config = require('../../config');
 var remove = require('./remove');
-var write = require('./write');
+var writeFile = require('./writeFile');
 
 var tests = {
   write: function(params) {
-    write.apply(this, params)
+    writeFile.apply(this, params)
       .catch(function(e) {
         console.log('e', e);
       })
