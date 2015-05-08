@@ -1,0 +1,36 @@
+{
+  "default": [{
+    "field": "image_thumbnail_1x",
+    "type": "thumbnail_mask",
+    "mapId": "nps.7j7nxwde",
+    "markerOffsetX": 0,
+    "markerOffsetY": 16.5,
+    "offsetX": 4,
+    "offsetY": 13.5,
+    "url": "http://api.tiles.mapbox.com/v4/{{mapId}}/url-{{icon}}({{longitudeMarker}},{{latitudeMarker}})/{{longitudeImage}},{{latitudeImage}},{{zoom}}/{{requestWidth}}x{{requestHeight}}{{extension}}?access_token={{token}}",
+    "icon": "http://nationalparkservice.github.io/data/places_mobile/icons/thumb-marker-alt.png",
+    "zoom": 15
+  }, {
+    "field": "image_thumbnail_2x",
+    "type": "thumbnail2x_mask",
+    "mapId": "nps.7j7nxwde",
+    "markerOffsetX": 0,
+    "markerOffsetY": 16.5,
+    "offsetX": 4,
+    "offsetY": 13.5,
+    "url": "http://api.tiles.mapbox.com/v4/{{mapId}}/url-{{icon}}({{longitudeMarker}},{{latitudeMarker}})/{{longitudeImage}},{{latitudeImage}},{{zoom}}/{{requestWidth}}x{{requestHeight}}{{extension}}?access_token={{token}}",
+    "icon": "http://nationalparkservice.github.io/data/places_mobile/icons/thumb-marker-alt@2x.png",
+    "zoom": 15
+  }, {
+    "field": "image_thumbnail_3x",
+    "type": "thumbnail3x_mask",
+    "mapId": "nps.7j7nxwde",
+    "markerOffsetX": 0,
+    "markerOffsetY": 24.75,
+    "offsetX": 6,
+    "offsetY": 20.25,
+    "url": "http://api.tiles.mapbox.com/v4/{{mapId}}/url-{{icon}}({{longitudeMarker}},{{latitudeMarker}})/{{longitudeImage}},{{latitudeImage}},{{zoom}}/{{requestWidth}}x{{requestHeight}}{{extension}}?access_token={{token}}",
+    "icon": "http://nationalparkservice.github.io/data/places_mobile/icons/thumb-marker-alt@3x.png",
+    "zoom": 15
+  }]
+}
