@@ -23,13 +23,13 @@
     "url": "http://github.com/nationalparkservice/resize-app"
   },
   "dependencies": {
-    "bluebird": "2.9.21",
+    "bluebird": "2.9.25",
     "btoa": "1.1.2",
     "datawrap": "git+http://github.com/jimmyrocks/datawrap",
     "express": "4.12.3",
     "magic-resize": "git+http://github.com/jimmyrocks/magick-resize",
-    "moment": "2.9.0",
+    "moment": "2.10.2",
     "multer": "0.1.8",
-    "request": "2.54.0"
+    "request": "2.55.0"
   }
 }
