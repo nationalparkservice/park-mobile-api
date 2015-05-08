@@ -1,4 +1,3 @@
-// B
 // Requires
 var datawrap = require('datawrap');
 var config = require('../../config');
@@ -38,7 +37,7 @@ var readTypes = {
           var sqlParts = schemaPart.source.sql,
             sqlString = 'SELECT {{fields}} FROM {{table}} WHERE {{where}}{{extras}}',
             getFields = function(props, fields) {
-              // Get the fields from the schema
+              // Get the fields from the properties
               var newFields = [];
               for (var property in props) {
                 if (!props[property].transformation || props[property].transformation === 'StringToArray') {
@@ -47,10 +46,12 @@ var readTypes = {
                   }
                 }
               }
-              for (var field in fields) {
-                if (field !== '*') {
-                  newFields.push(field);
-                }
+
+              // Replace the '*' with the new fields
+              if (fields.indexOf('*') >= 0 && newFields.length) {
+                newFields = fields.slice(0, fields.indexOf('*')).concat(newFields).concat(fields.slice(fields.indexOf('*') + 1));
+              } else {
+                newFields = fields;
               }
               return newFields;
             };
@@ -58,7 +59,7 @@ var readTypes = {
           // Fields
           sqlParts.properties = schemaPart.items ? schemaPart.items.properties : schemaPart.properties;
           if (sqlParts.properties) {
-            sqlParts.fields = getFields(sqlParts.properties, sqlParts.fields || []);
+            sqlParts.fields = getFields(sqlParts.properties, sqlParts.fields || ['*']);
           }
           if (schemaPart.key) sqlParts.fields.unshift(schemaPart.key);
 
@@ -157,7 +158,10 @@ module.exports = function(options, unitCode) {
       .then(function(schema) {
         readData(schema, unitCode)
           .then(function(parkData) {
-            fulfill({schema: schema, parkData: parkData});
+            fulfill({
+              schema: schema,
+              parkData: parkData
+            });
           })
           .catch(reject);
       })
