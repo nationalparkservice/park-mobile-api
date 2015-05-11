@@ -27,9 +27,7 @@
       'description': 'Removes an image from the server',
       'method': 'DELETE',
       'path': '/image/:imageId',
-      'process': function(req, res) {
-        // TODO?
-        return ([req, res]);
+      'process': [imageMulter, processImage]
       }
     }, {
       'name': 'GET generate/json',
