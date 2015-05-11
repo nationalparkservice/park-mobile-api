@@ -28,7 +28,6 @@
       'method': 'DELETE',
       'path': '/image/:imageId',
       'process': [imageMulter, processImage]
-      }
     }, {
       'name': 'GET generate/json',
       'description': 'Regenerates the app.json and meta.json for all parks',
