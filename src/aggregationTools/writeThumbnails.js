@@ -1,13 +1,13 @@
 var datawrap = require('datawrap');
-var Bluebird = datawrap.Bluebird;
 var thumbnailSettings = require('../../thumbnailSettings');
 var magickTypes = require('../../node_modules/magick-resize/types');
+var magickResizeWrapper = require('../magickResizeWrapper');
 var geoTools = require('../geoTools.js');
 var fs = require('fs');
-var magickResize = require('magick-resize');
 var mkdirp = require('mkdirp');
 var path = require('path');
-Bluebird.promisifyAll(fs);
+
+datawrap.Bluebird.promisifyAll(fs);
 
 // Offsets the marker from its lat/lon by and offset in pixels
 var addOffset = function(obj) {
@@ -29,26 +29,6 @@ var objMerge = function(objs) {
   }
   newObj.icon = encodeURIComponent(newObj.icon);
   return newObj;
-};
-
-// A wrapper to make magickResize easier to work with
-var magickResizeWrapper = function(args) {
-  return new Bluebird(function(fulfill, reject) {
-    // magickResize takes single letter args since it is a command line tool, so we just use the first letter
-    var newArgs = {};
-    for (var arg in args) {
-      if (arg.substr(0, 1) !== '_') {
-        newArgs[arg.substr(0, 1)] = args[arg];
-      }
-    }
-    magickResize(newArgs, function(e, r) {
-      if (e || !r) {
-        reject(e.stack ? e : new Error(e));
-      } else {
-        fulfill(0);
-      }
-    });
-  });
 };
 
 // Returns the right format for values (used to parse filenames)
@@ -131,7 +111,7 @@ var getThumbnailData = function(media, sites) {
 var deleteFiles = function(fileList) {
   // Function that deletes a single file
   var deleteFile = function(filename) {
-    return new Bluebird(function(fulfill, reject) {
+    return new datawrap.Bluebird(function(fulfill, reject) {
       fs.unlinkAsync(filename)
         .then(fulfill)
         .catch(function(e) {
@@ -146,7 +126,7 @@ var deleteFiles = function(fileList) {
   };
 
 
-  return new Bluebird(function(fulfill, reject) {
+  return new datawrap.Bluebird(function(fulfill, reject) {
     var deleteTasks = fileList.map(function(d) {
       return {
         'name': 'Deleting the temp file for: ' + d.output,
@@ -163,7 +143,7 @@ var deleteFiles = function(fileList) {
 // Writes files to the directory / server
 var moveFiles = function(fileList, config) {
   var moveFile = function(oldName, newName) {
-    return new Bluebird(function(fulfill, reject) {
+    return new datawrap.Bluebird(function(fulfill, reject) {
       mkdirp(path.dirname(newName), function(error) {
         if (!error) {
           fs.renameAsync(oldName, newName)
@@ -175,7 +155,7 @@ var moveFiles = function(fileList, config) {
       });
     });
   };
-  return new Bluebird(function(fulfill, reject) {
+  return new datawrap.Bluebird(function(fulfill, reject) {
     var filePath = config.fileLocation + '/{{_unitCode}}/media/{{_filename}}',
       taskList = fileList.map(function(file) {
         return {
@@ -193,7 +173,7 @@ var moveFiles = function(fileList, config) {
 
 module.exports = function(appJson, unitCode, config) {
   var media, sites;
-  return new Bluebird(function(fulfill, reject) {
+  return new datawrap.Bluebird(function(fulfill, reject) {
     // Loop through every site, get its lat / lon
     // generate a thumbnail from mapbox and upload it to github
     // Copy the objects
