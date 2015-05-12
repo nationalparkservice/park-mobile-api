@@ -1,21 +1,27 @@
-var Bluebird = require('bluebird');
-var writeData = require('../github/writeData');
+var Bluebird = require('datawrap').Bluebird;
+var mkdirp = require('mkdirp');
+var path = require('path');
+var fs = require('fs');
+Bluebird.promisifyAll(fs);
 
 module.exports = function(appJson, unitCode, config) {
   return new Bluebird(function(fulfill, reject) {
-    var githubSettings = JSON.parse(JSON.stringify(config.github));
-    var githubPath = 'places_mobile/' + unitCode + '/app.json';
-    writeData(JSON.stringify(appJson, null, 2), githubPath, githubSettings, config)
-      .then(function(r) {
-        delete githubSettings.filePath;
-        var newGithubPath = githubPath.replace(/\.json$/, '.min.json');
-        config.github.filePath = newGithubPath;
-        writeData(JSON.stringify(appJson), newGithubPath, config.github, config)
-          .then(function(r2) {
-            fulfill([r, r2]);
+    var filePath = config.fileLocation + '/' + unitCode + '/app.json';
+    var minFilePath = filePath.replace(/\.json$/, '.min.json');
+    mkdirp(path.dirname(filePath), function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        fs.writeFileAsync(filePath, JSON.stringify(appJson, null, 2))
+          .then(function(r) {
+            fs.writeFileAsync(minFilePath, JSON.stringify(appJson))
+              .then(function(r2) {
+                fulfill([r, r2]);
+              })
+              .catch(reject);
           })
           .catch(reject);
-      })
-      .catch(reject);
+      }
+    });
   });
 };
