@@ -1,7 +1,8 @@
 var fs = require('fs');
+var Bluebird = require('datawrap').Bluebird;
 var writeAppJson = require('../writeAppJson');
 var config = require('../../../config');
-var removeGithubFile = require('../../github/remove');
+fs = Bluebird.promisifyAll(fs);
 
 var jsonFilePath = '../../../app.schema.json';
 var jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
@@ -9,10 +10,10 @@ var jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
 writeAppJson(jsonData, 'test', config)
   .then(function() {
     console.log('Test Data written successfully');
-    removeGithubFile('places_mobile/test/app.json', config.github, config)
+    fs.unlinkAsync(config.fileLocation + '/test/app.json')
       .then(function() {
         console.log('app.json removed successfully');
-        removeGithubFile('places_mobile/test/app.min.json', config.github, config)
+        fs.unlinkAsync(config.fileLocation +'/test/app.min.json')
           .then(function() {
             console.log('app.min.json removed successfully');
           })
