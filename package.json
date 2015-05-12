@@ -20,16 +20,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/nationalparkservice/resize-app"
+    "url": "http://github.com/nationalparkservice/places-mobile-api"
   },
   "dependencies": {
-    "bluebird": "2.9.25",
-    "btoa": "1.1.2",
     "datawrap": "git+http://github.com/jimmyrocks/datawrap",
     "express": "4.12.3",
+    "glob": "5.0.5",
     "magic-resize": "git+http://github.com/jimmyrocks/magick-resize",
-    "moment": "2.10.2",
-    "multer": "0.1.8",
-    "request": "2.55.0"
+    "mkdirp": "0.5.0",
+    "multer": "0.1.8"
   }
 }
