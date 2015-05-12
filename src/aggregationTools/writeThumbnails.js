@@ -1,13 +1,15 @@
-var Bluebird = require('bluebird');
 var datawrap = require('datawrap');
+var Bluebird = datawrap.Bluebird;
 var thumbnailSettings = require('../../thumbnailSettings');
 var magickTypes = require('../../node_modules/magick-resize/types');
-var writeFile = require('../github/writeFile');
 var geoTools = require('../geoTools.js');
 var fs = require('fs');
 var magickResize = require('magick-resize');
+var mkdirp = require('mkdirp');
+var path = require('path');
 Bluebird.promisifyAll(fs);
 
+// Offsets the marker from its lat/lon by and offset in pixels
 var addOffset = function(obj) {
   obj.longitudeMarker = obj.zoom && obj.markerOffsetX ? geoTools.addPixelsToLong(obj.markerOffsetX, obj.longitude, obj.zoom).toString() : obj.longitude;
   obj.latitudeMarker = obj.zoom && obj.markerOffsetY ? geoTools.addPixelsToLat(obj.markerOffsetY, obj.latitude, obj.zoom).toString() : obj.latitude;
@@ -16,6 +18,7 @@ var addOffset = function(obj) {
   return obj;
 };
 
+// Merges two objects togetger
 var objMerge = function(objs) {
   var newObj = {},
     attrname;
@@ -28,6 +31,7 @@ var objMerge = function(objs) {
   return newObj;
 };
 
+// A wrapper to make magickResize easier to work with
 var magickResizeWrapper = function(args) {
   return new Bluebird(function(fulfill, reject) {
     // magickResize takes single letter args since it is a command line tool, so we just use the first letter
@@ -47,6 +51,7 @@ var magickResizeWrapper = function(args) {
   });
 };
 
+// Returns the right format for values (used to parse filenames)
 var formatValue = function(value) {
   var returnValue = null;
   if (value !== false && value) {
@@ -61,13 +66,13 @@ var formatValue = function(value) {
   return returnValue;
 };
 
+// Makes a list of requests from mapbox and downloads them
 var getRequests = function(thumbnailList, unitCode, config) {
   var requestList = [];
   var settings = thumbnailSettings[unitCode] || thumbnailSettings['default'];
   thumbnailList.map(function(img) {
     settings.map(function(setting) {
       var imgRequest = {
-        // _img: img,
         type: setting.type,
         output: (formatValue(img[setting.field]) ? Math.random().toString(27).substr(2, 10) + '_' + formatValue(img[setting.field]) : null)
       };
@@ -85,6 +90,7 @@ var getRequests = function(thumbnailList, unitCode, config) {
   return requestList;
 };
 
+// Gets the information about the thumbnail
 var getThumbnailData = function(media, sites) {
   var checkField = function(parents, field) {
     return parents && parents[field] ? parents[field] : null;
@@ -121,17 +127,21 @@ var getThumbnailData = function(media, sites) {
   return thumbnails;
 };
 
+// We delete files if there's an error so we don't have a bunch of files lying around
 var deleteFiles = function(fileList) {
-
   // Function that deletes a single file
   var deleteFile = function(filename) {
     return new Bluebird(function(fulfill, reject) {
-      fs.existsAsync(filename)
-        .then(function() {
-          fs.unlink(filename)
-            .then(fulfill)
-            .catch(reject);
-        }).catch(reject);
+      fs.unlinkAsync(filename)
+        .then(fulfill)
+        .catch(function(e) {
+          // ENOENT means it was already deleted
+          if (e.code === 'ENOENT') {
+            fulfill();
+          } else {
+            reject(e);
+          }
+        });
     });
   };
 
@@ -150,15 +160,28 @@ var deleteFiles = function(fileList) {
   });
 };
 
-var uploadFiles = function(fileList, config) {
+// Writes files to the directory / server
+var moveFiles = function(fileList, config) {
+  var moveFile = function(oldName, newName) {
+    return new Bluebird(function(fulfill, reject) {
+      mkdirp(path.dirname(newName), function(error) {
+        if (!error) {
+          fs.renameAsync(oldName, newName)
+            .then(fulfill)
+            .catch(reject);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  };
   return new Bluebird(function(fulfill, reject) {
-    var githubSettings = JSON.parse(JSON.stringify(config.github)),
-      githubPath = 'places_mobile/{{_unitCode}}/media/{{_filename}}',
+    var filePath = config.fileLocation + '/{{_unitCode}}/media/{{_filename}}',
       taskList = fileList.map(function(file) {
         return {
-          'name': 'Uploading ' + file._filename,
-          'task': function(){return new Bluebird(function(f){console.log.apply(arguments); f(true);})}, //writeFile,
-          'params': [file.output, datawrap.fandlebars(githubPath, file), githubSettings, config]
+          'name': 'Moving ' + file._filename,
+          'task': moveFile,
+          'params': [file.output, datawrap.fandlebars(filePath, file)]
         };
       });
 
@@ -168,15 +191,15 @@ var uploadFiles = function(fileList, config) {
   });
 };
 
-module.exports = function(config, unitCode, parkJson) {
+module.exports = function(appJson, unitCode, config) {
   var media, sites;
   return new Bluebird(function(fulfill, reject) {
     // Loop through every site, get its lat / lon
     // generate a thumbnail from mapbox and upload it to github
     // Copy the objects
     try {
-      media = JSON.parse(JSON.stringify(parkJson.media));
-      sites = JSON.parse(JSON.stringify(parkJson.sites));
+      media = JSON.parse(JSON.stringify(appJson.media));
+      sites = JSON.parse(JSON.stringify(appJson.sites));
     } catch (e) {
       // If there are no sites, reject this!
       reject(e);
@@ -200,7 +223,7 @@ module.exports = function(config, unitCode, parkJson) {
     // Run the task list and then either upload the files or send back an error
     datawrap.runList(taskList).then(function() {
       // Success, so upload the files to github!
-      uploadFiles(imgRequests, config)
+      moveFiles(imgRequests, config)
         .then(function() {
           // Delete any files that we made
           deleteFiles(imgRequests).then(function() {
