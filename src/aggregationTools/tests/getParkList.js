@@ -14,7 +14,7 @@ getParkList('klgo').catch(function(e) {
 });
 
 console.log('Getting multiple specific parks');
-getParkList(['klgo', 'heho']).catch(function(e) {
+getParkList(['klgo', 'heho', 'Brooklyn']).catch(function(e) {
   console.log('error', e);
 }).then(function(r){
   console.log('Getting multiple specific parks', r);
