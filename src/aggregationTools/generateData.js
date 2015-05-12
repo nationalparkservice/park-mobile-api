@@ -1,18 +1,21 @@
+// This reads the schema file and downloads the associated information from CartoDB
+
 // Requires
 var datawrap = require('datawrap');
-var config = require('../../config');
-var readFile = require('../github/githubFunctions.js').readFile;
+var fs = require('fs');
 
 // Tools
 var Bluebird = datawrap.Bluebird;
 var fandlebars = datawrap.fandlebars;
 var runList = datawrap.runList;
 
+Bluebird.promisifyAll(fs);
+
 var readSchemaFile = function(schemaFile) {
   return new Bluebird(function(fulfill, reject) {
     // Read the Schema File
     if (schemaFile) {
-      readFile(schemaFile, 'utf8')
+      fs.readFileAsync(schemaFile, 'utf8')
         .then(function(schemaData) {
           var schema;
           try {
@@ -31,7 +34,7 @@ var readSchemaFile = function(schemaFile) {
 
 var readTypes = {
   'http': {
-    'cartodb': function(schemaPart, unitCode) {
+    'cartodb': function(schemaPart, unitCode, config) {
       return new Bluebird(function(fulfill, reject) {
         var buildSql = function() {
           var sqlParts = schemaPart.source.sql,
@@ -96,12 +99,12 @@ var readTypes = {
   }
 };
 
-var readSource = function(schemaPart, unitCode) {
+var readSource = function(schemaPart, unitCode, config) {
   var sourceInfo = schemaPart.source;
 
   return new Bluebird(function(fulfill, reject) {
     if (readTypes[sourceInfo.type] && readTypes[sourceInfo.type][sourceInfo.format]) {
-      readTypes[sourceInfo.type][sourceInfo.format](schemaPart, unitCode)
+      readTypes[sourceInfo.type][sourceInfo.format](schemaPart, unitCode, config)
         .then(function(data) {
           fulfill({
             'data': data,
@@ -118,7 +121,7 @@ var readSource = function(schemaPart, unitCode) {
   });
 };
 
-var readData = function(schema, unitCode) {
+var readData = function(schema, unitCode, config) {
   var taskList = [];
   var getData = function(schemaPart) {
     var field;
@@ -127,7 +130,7 @@ var readData = function(schema, unitCode) {
       taskList.push({
         'name': 'Getting a schemaPart',
         'task': readSource,
-        'params': [schemaPart, unitCode]
+        'params': [schemaPart, unitCode, config]
       });
     }
     if (schemaPart.properties && typeof(schemaPart.properties) === 'object' && !Array.isArray(schemaPart.properties)) {
@@ -151,16 +154,16 @@ var readData = function(schema, unitCode) {
   });
 };
 
-module.exports = function(options, unitCode) {
+module.exports = function(schemaPath, unitCode, config) {
   return new Bluebird(function(fulfill, reject) {
     // Read the Schema File
-    readSchemaFile(options.schema)
+    readSchemaFile(schemaPath)
       .then(function(schema) {
-        readData(schema, unitCode)
+        readData(schema, unitCode, config)
           .then(function(parkData) {
             fulfill({
-              schema: schema,
-              parkData: parkData
+              schemaJson: schema,
+              parkJson: parkData
             });
           })
           .catch(reject);
