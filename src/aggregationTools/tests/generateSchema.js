@@ -1,13 +1,12 @@
 var generateData = require('../generateData');
 var generateSchema = require('../generateSchema');
 var schemaFile = '../../../app.schema.json';
+var config = require('../../../config');
 
-generateData({
-    schema: schemaFile
-  }, 'klgo')
+generateData(schemaFile, 'klgo', config)
   .then(function(r) {
     console.log('************* DATA COMPLETED ****************');
-    generateSchema(r.schema, r.parkData)
+    generateSchema(r)
       .then(function(r2) {
         console.log('Success: ', r2);
       })
