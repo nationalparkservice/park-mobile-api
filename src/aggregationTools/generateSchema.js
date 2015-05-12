@@ -1,4 +1,6 @@
-var Bluebird = require('bluebird');
+// This puts the information downloaded from CartoDB into our schema
+
+var Bluebird = require('datawrap').Bluebird;
 
 var tools = {
   format: {
@@ -141,11 +143,13 @@ var tools = {
     }
   }
 };
-module.exports = function(schemaFile, parkData) {
+module.exports = function(options) { /*schemaJson, parkJson*/
+  var schemaJson = options.schemaJson,
+    parkJson = options.parkJson;
   return new Bluebird(function(fulfill, reject) {
     var returnValue = {};
     try {
-      returnValue = tools.read.schema(schemaFile, parkData, 0);
+      returnValue = tools.read.schema(schemaJson, parkJson, 0);
       fulfill(returnValue);
     } catch (e) {
       reject(e);
