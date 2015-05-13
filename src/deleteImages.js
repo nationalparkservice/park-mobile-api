@@ -19,7 +19,7 @@ module.exports = function(options) {
           return {
             'name': 'Remove file ' + file,
             'task': fs.unlinkAsync,
-            'params': [file]
+            'params': [mediaDirectory + file]
           };
         });
         datawrap.runList(taskList)
