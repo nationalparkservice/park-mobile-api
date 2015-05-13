@@ -1,6 +1,7 @@
 var datawrap = require('datawrap'),
   fs = require('fs'),
   magickResize = require('magick-resize'),
+  path = require('path'),
   mkdirp = require('mkdirp');
 
 datawrap.Bluebird.promisifyAll(fs);

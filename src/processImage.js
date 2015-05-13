@@ -1,6 +1,7 @@
 var config = require('../config'),
   createUuid = require('./createUuid'),
   deleteImages = require('./deleteImages'),
+  fs = require('fs'),
   resizeImages = require('./resizeImages');
 
 var success = function(uuid, res) {
@@ -34,10 +35,17 @@ module.exports = function(req, res) {
         success(uuid, res);
       })
       .catch(function(err) {
-        reportError(err, res);
+        // Delete the original file
+        fs.unlink(req.files[field].path, function() {
+          // Don't catch errors with deleting the file, the error is usually "not found", and we already have a more import error to return
+          reportError(err, res);
+        });
       });
   } else if (req.body.uuid && (req.method === 'DELETE' || req.body.del === 'DELETE')) {
     // Delete an image
+    if (req.files[field] && req.files[field].path) {
+      fs.unlinkSync(req.files[field].path);
+    }
     deleteImages({
         'mediaDirectory': config.fileLocation + '/' + unitCode + '/media/',
         'uuid': uuid
