@@ -9,7 +9,7 @@ module.exports = function(options) {
     uuid = options.uuid;
 
   return new datawrap.Bluebird(function(fulfill, reject) {
-    var taskList = fileTypes.map(function(type) {
+    var taskList = fileTypes.map(function(type, index) {
       var outputFile = mediaDirectory + '/' + uuid + '_' + type + path.extname(filePath);
       return {
         'name': 'Resize to ' + type,
@@ -18,7 +18,7 @@ module.exports = function(options) {
           f: filePath,
           o: outputFile,
           t: type,
-          _deleteOriginal: true
+          _deleteOriginal: index === fileTypes.length - 1 // Delete the image on the last task
         }]
       };
     });
