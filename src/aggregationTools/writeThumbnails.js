@@ -1,11 +1,11 @@
-var datawrap = require('datawrap');
-var thumbnailSettings = require('../../thumbnailSettings');
-var magickTypes = require('../../node_modules/magick-resize/types');
-var magickResizeWrapper = require('../magickResizeWrapper');
-var geoTools = require('../geoTools.js');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
-var path = require('path');
+var datawrap = require('datawrap'),
+  fs = require('fs'),
+  geoTools = require('../geoTools.js'),
+  magickResizeWrapper = require('../magickResizeWrapper'),
+  magickTypes = require('../../node_modules/magick-resize/types'),
+  mkdirp = require('mkdirp'),
+  path = require('path'),
+  thumbnailSettings = require('../../thumbnailSettings');
 
 datawrap.Bluebird.promisifyAll(fs);
 
@@ -71,20 +71,26 @@ var getRequests = function(thumbnailList, unitCode, config) {
 };
 
 // Gets the information about the thumbnail
-var getThumbnailData = function(media, sites) {
+var getThumbnailData = function(media, sites, requestedSites) {
   var checkField = function(parents, field) {
     return parents && parents[field] ? parents[field] : null;
   };
 
-  // Filter out the array so we only have thumbnail
+  // Filter out the media array so we only have thumbnails
   var thumbnails = media.filter(function(a) {
     return a.type === 'map_thumbnail';
   });
 
   var findMatch = function(sites, thumbnailId) {
     for (var i = 0; i < sites.length; i++) {
+      // Check if there is a thumnail associated with this site
       if (checkField(sites[i], 'map_thumbnail_image') === thumbnailId) {
-        return i;
+        // Check it we're requesting this thumbnail
+        console.log('We found a match, let\'s see if it\'s in the list', requestedSites, checkField(sites[i], 'id'));
+        if (requestedSites === true || requestedSites.indexOf(checkField(sites[i], 'id')) >= 0) {
+          console.log('Adding ', checkField(sites[i], 'id'), 'to the list');
+          return i;
+        }
       }
     }
     return null;
@@ -96,7 +102,7 @@ var getThumbnailData = function(media, sites) {
     if (match) {
       thumbnail.latitude = sites[match].latitude;
       thumbnail.longitude = sites[match].longitude;
-    } else {}
+    }
     return match ? thumbnail : null;
   });
 
@@ -171,52 +177,57 @@ var moveFiles = function(fileList, config) {
   });
 };
 
-module.exports = function(appJson, unitCode, config) {
+module.exports = function(appJson, unitCode, config, requestedSites) {
   var media, sites;
   return new datawrap.Bluebird(function(fulfill, reject) {
-    // Loop through every site, get its lat / lon
-    // generate a thumbnail from mapbox and upload it to github
-    // Copy the objects
-    try {
-      media = JSON.parse(JSON.stringify(appJson.media));
-      sites = JSON.parse(JSON.stringify(appJson.sites));
-    } catch (e) {
-      // If there are no sites, reject this!
-      reject(e);
-    }
+    if (!requestedSites) {
+      fulfill();
+    } else {
+      requestedSites = requestedSites === true || Array.isArray(requestedSites) ? requestedSites : [requestedSites];
+      // Loop through every site, get its lat / lon
+      // generate a thumbnail from mapbox and upload it to github
+      // Copy the objects
+      try {
+        media = JSON.parse(JSON.stringify(appJson.media));
+        sites = JSON.parse(JSON.stringify(appJson.sites));
+      } catch (e) {
+        // If there are no sites, reject this!
+        reject(e);
+      }
 
-    // Match the thumbnails to the sites
-    var matchedThumbnails = getThumbnailData(media, sites);
-    // Create a list of URLs to request for processing
-    var imgRequests = getRequests(matchedThumbnails, unitCode, config);
+      // Match the thumbnails to the sites
+      var matchedThumbnails = getThumbnailData(media, sites, requestedSites);
+      // Create a list of URLs to request for processing
+      var imgRequests = getRequests(matchedThumbnails, unitCode, config);
 
-    // Create a task list to go and download and generate all of the thumbnails
-    var taskList = [];
-    imgRequests.map(function(imgRequest) {
-      taskList.push({
-        'name': 'Download and resize thumbmail ' + imgRequest._filename,
-        'task': magickResizeWrapper,
-        'params': imgRequest
+      // Create a task list to go and download and generate all of the thumbnails
+      var taskList = [];
+      imgRequests.map(function(imgRequest) {
+        taskList.push({
+          'name': 'Download and resize thumbmail ' + imgRequest._filename,
+          'task': magickResizeWrapper,
+          'params': imgRequest
+        });
       });
-    });
 
-    // Run the task list and then either upload the files or send back an error
-    datawrap.runList(taskList).then(function() {
-      // Success, so upload the files to github!
-      moveFiles(imgRequests, config)
-        .then(function() {
-          // Delete any files that we made
-          deleteFiles(imgRequests).then(function() {
-            // Return that there was success
-            fulfill(imgRequests);
+      // Run the task list and then either upload the files or send back an error
+      datawrap.runList(taskList).then(function() {
+        // Success, so upload the files to github!
+        moveFiles(imgRequests, config)
+          .then(function() {
+            // Delete any files that we made
+            deleteFiles(imgRequests).then(function() {
+              // Return that there was success
+              fulfill(imgRequests);
+            }).catch(reject);
           }).catch(reject);
+      }).catch(function(err) {
+        // Error, so delete any files that we made
+        deleteFiles(imgRequests).then(function() {
+          // Return the original error
+          reject(err);
         }).catch(reject);
-    }).catch(function(err) {
-      // Error, so delete any files that we made
-      deleteFiles(imgRequests).then(function() {
-        // Return the original error
-        reject(err);
-      }).catch(reject);
-    });
+      });
+    }
   });
 };
