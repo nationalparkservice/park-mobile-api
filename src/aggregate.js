@@ -1,36 +1,42 @@
-var datawrap = require('datawrap');
+var datawrap = require('datawrap'),
+  addStatusTools = require('./addStatuses');
 
 // Require the external tools
-var getParkList = require('./aggregationTools/getParkList'); // = function(unitCode(s)){}; - return array of unitCodes
-var generateData = require('./aggregationTools/generateData'); // = function(schemaPath, unitCode) -- returns SchemaJson and ParkJson
-var generateSchema = require('./aggregationTools/generateSchema'); // = function({SchemaJson, ParkJson}); -- Returns AppJson
-var writeThumbnails = require('./aggregationTools/writeThumbnails'); // = function(config, unitCode, AppJson)
-var writeAppJson = require('./aggregationTools/writeAppJson'); // = function(AppJson, unitCode, config)
-var writeMetaJson = require('./aggregationTools/writeMetaJson'); // = function(appJson, unitCode, config)
+var tools = {
+  getParkList: require('./aggregationTools/getParkList'), // = function(unitCode(s)){}; - return array of unitCodes
+  generateData: require('./aggregationTools/generateData'), // = function(schemaPath, unitCode) -- returns SchemaJson and ParkJson
+  generateSchema: require('./aggregationTools/generateSchema'), // = function({SchemaJson, ParkJson}); -- Returns AppJson
+  writeThumbnails: require('./aggregationTools/writeThumbnails'), // = function(config, unitCode, AppJson)
+  writeAppJson: require('./aggregationTools/writeAppJson'), // = function(AppJson, unitCode, config)
+  writeMetaJson: require('./aggregationTools/writeMetaJson') // = function(appJson, unitCode, config)
+};
 
-var aggregatePark = function(schemaPath, unitCode, config) {
+var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSites) {
   return new datawrap.Bluebird(function(fulfill, reject) {
     var taskList = [{
       'name': 'GenerateData',
-      'task': generateData,
+      'task': tools.generateData,
       'params': [schemaPath, unitCode, config]
     }, {
       'name': 'GenerateSchema',
-      'task': generateSchema,
+      'task': tools.generateSchema,
       'params': ['{{GenerateData}}']
     }, {
       'name': 'Write the thumbnails',
-      'task': writeThumbnails,
+      'task': tools.writeThumbnails,
+      'params': ['{{GenerateSchema}}', unitCode, config, thumbnailSites]
+    }, {
+      'name': 'Generate Data from CartoDB',
+      'task': tools.writeAppJson,
       'params': ['{{GenerateSchema}}', unitCode, config]
     }, {
       'name': 'Generate Data from CartoDB',
-      'task': writeAppJson,
-      'params': ['{{GenerateSchema}}', unitCode, config]
-    }, {
-      'name': 'Generate Data from CartoDB',
-      'task': writeMetaJson,
+      'task': tools.writeMetaJson,
       'params': ['{{GenerateSchema}}', unitCode, config]
     }];
+
+    // Add tools that will keep track of the status for status reporting
+    taskList = addStatusTools(taskList, taskName);
 
     datawrap.runList(taskList)
       .then(fulfill)
@@ -38,7 +44,7 @@ var aggregatePark = function(schemaPath, unitCode, config) {
   });
 };
 
-module.exports = function(schemaPath, unitCodes, config) {
+module.exports = function(schemaPath, unitCodes, config, taskName, thumbnailSites) {
   return new datawrap.Bluebird(function(resolve, reject) {
     getParkList(unitCodes)
       .then(function(validParkList) {
@@ -46,7 +52,7 @@ module.exports = function(schemaPath, unitCodes, config) {
           return {
             'name': 'Aggregate ' + unitCode,
             'task': aggregatePark,
-            'params': [schemaPath, unitCode, config]
+            'params': [schemaPath, unitCode, config, taskName, thumbnailSites]
           };
         });
 
