@@ -1,4 +1,5 @@
-  var imageMulter = require('./imageMulter'),
+  var aggregationWrapper = require('./aggregationWrapper'),
+    imageMulter = require('./imageMulter'),
     processImage = require('./processImage');
 
   module.exports = function(config) {
@@ -33,24 +34,24 @@
       'description': 'Regenerates the app.json and meta.json for all parks',
       'method': 'GET',
       'path': '/generate/json',
-      'process': [imageMulter, processImage]
-    },{
+      'process': [aggregationWrapper]
+    }, {
       'name': 'GET generate/json/:unitCode',
       'description': 'Regenerates the app.json and meta.json for the specified unit code',
       'method': 'GET',
       'path': '/generate/json/:unitCode',
-      'process': [imageMulter, processImage]
+      'process': [aggregationWrapper]
     }, {
       'name': 'GET generate/thumbnails',
       'description': 'Regenerates the thumbnails for all parks',
       'method': 'GET',
       'path': '/generate/thumbnails',
-      'process': [imageMulter, processImage]
-    },{
+      'process': [aggregationWrapper]
+    }, {
       'name': 'GET generate/thumbnails/:unitCode',
       'description': 'Regenerates the thumbnails for the specified unit code',
       'method': 'GET',
       'path': '/generate/thumbnails/:unitCode',
-      'process': [imageMulter, processImage]
+      'process': [aggregationWrapper]
     }];
   };
