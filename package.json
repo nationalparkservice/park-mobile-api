@@ -23,6 +23,7 @@
     "url": "http://github.com/nationalparkservice/places-mobile-api"
   },
   "dependencies": {
+    "adm-zip": "0.4.7",
     "datawrap": "git+http://github.com/jimmyrocks/datawrap",
     "express": "4.12.3",
     "glob": "5.0.5",
