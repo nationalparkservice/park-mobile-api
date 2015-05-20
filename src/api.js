@@ -43,14 +43,8 @@
       'path': '/generate/json/:unitCode',
       'process': [aggregationWrapper]
     }, {
-      'name': 'GET generate/thumbnails/:siteId',
-      'description': 'Regenerates the thumbnails for all parks',
-      'method': 'GET',
-      'path': '/generate/thumbnails/:siteId',
-      'process': [aggregationWrapper]
-    }, {
       'name': 'GET generate/thumbnails/:unitCode/:siteId',
-      'description': 'Regenerates the thumbnails for the specified unit code and specific site',
+      'description': 'Regenerates the thumbnails for the specified unit code and specific site, use "all" to generate all sites',
       'method': 'GET',
       'path': '/generate/thumbnails/:unitCode/:siteId',
       'process': [aggregationWrapper]
