@@ -29,6 +29,7 @@
     "glob": "5.0.5",
     "magic-resize": "git+http://github.com/jimmyrocks/magick-resize",
     "mkdirp": "0.5.0",
-    "multer": "0.1.8"
+    "multer": "0.1.8",
+    "node-persist": "0.0.3"
   }
 }
