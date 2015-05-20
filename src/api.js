@@ -1,4 +1,5 @@
   var aggregationWrapper = require('./aggregationWrapper'),
+    getStatus = require('./getStatus'),
     imageMulter = require('./imageMulter'),
     processImage = require('./processImage');
 
@@ -42,16 +43,22 @@
       'path': '/generate/json/:unitCode',
       'process': [aggregationWrapper]
     }, {
-      'name': 'GET generate/thumbnails',
+      'name': 'GET generate/thumbnails/:siteId',
       'description': 'Regenerates the thumbnails for all parks',
       'method': 'GET',
-      'path': '/generate/thumbnails',
+      'path': '/generate/thumbnails/:siteId',
       'process': [aggregationWrapper]
     }, {
-      'name': 'GET generate/thumbnails/:unitCode',
-      'description': 'Regenerates the thumbnails for the specified unit code',
+      'name': 'GET generate/thumbnails/:unitCode/:siteId',
+      'description': 'Regenerates the thumbnails for the specified unit code and specific site',
       'method': 'GET',
-      'path': '/generate/thumbnails/:unitCode',
+      'path': '/generate/thumbnails/:unitCode/:siteId',
       'process': [aggregationWrapper]
+    }, {
+      'name': 'GET generate/status/:process',
+      'description': 'Gets the status of a process',
+      'method': 'GET',
+      'path': '/generate/status/:process',
+      'process': [getStatus]
     }];
   };
