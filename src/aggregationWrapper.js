@@ -20,7 +20,7 @@ var reportError = function(error, res) {
 
 module.exports = function(req, res) {
   var taskName = createUuid();
-  if (req.query && req.query.async) {
+  if (!(req.query && req.query.sync)) {
     success(taskName, res);
   }
   var thumbnails = false; // true means all thumbnails, or you can pass in a single site id for a single site, or an array of site numbers
@@ -30,7 +30,7 @@ module.exports = function(req, res) {
       thumbnails = true;
     } else {
       thumbnails = [];
-      thumbnails = req.params.siteId.split(',').forEach(function(tn) {
+      req.params.siteId.split(',').forEach(function(tn) {
         if (!isNaN(tn)) {
           thumbnails.push(parseInt(tn, 10));
         }
@@ -38,7 +38,7 @@ module.exports = function(req, res) {
     }
   }
 
-  aggregate('app.schema.json', (req.body && req.body.unitCode) || (req.params && req.params.siteId), config, taskName, thumbnails)
+  aggregate('app.schema.json', (req.body && req.body.unitCode) || (req.params && req.params.unitCode), config, taskName, thumbnails)
     .then(function() {
       success(taskName, res);
     })

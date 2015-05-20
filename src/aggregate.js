@@ -48,6 +48,7 @@ module.exports = function(schemaPath, unitCodes, config, taskName, thumbnailSite
   return new datawrap.Bluebird(function(resolve, reject) {
     tools.getParkList(unitCodes)
       .then(function(validParkList) {
+        console.log('Valid Parks', validParkList, unitCodes);
         var taskList = validParkList.map(function(unitCode) {
           return {
             'name': 'Aggregate ' + unitCode,
