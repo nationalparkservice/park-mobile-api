@@ -1,12 +1,22 @@
 var datawrap = require('datawrap'),
-  fs = require('fs');
+  fs = require('fs'),
+  storage = require('node-persist');
 
 fs = datawrap.Bluebird.promisifyAll(fs);
 
 var statusFunction = function(status, name) {
-  return datawrap.Bluebird(function(fulfill) {
-    console.log(status, name);
-    fulfill();
+  return new datawrap.Bluebird(function(fulfill, reject) {
+    storage.initSync();
+    storage.setItem(name, status).then(
+      function() {
+        //success
+        fulfill(storage.getItem(name));
+      },
+      function() {
+        //Error
+        reject('Storage Error');
+      }
+    );
   });
 };
 
