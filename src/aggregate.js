@@ -8,7 +8,8 @@ var tools = {
   generateSchema: require('./aggregationTools/generateSchema'), // = function({SchemaJson, ParkJson}); -- Returns AppJson
   writeThumbnails: require('./aggregationTools/writeThumbnails'), // = function(config, unitCode, AppJson)
   writeAppJson: require('./aggregationTools/writeAppJson'), // = function(AppJson, unitCode, config)
-  writeMetaJson: require('./aggregationTools/writeMetaJson') // = function(appJson, unitCode, config)
+  writeMetaJson: require('./aggregationTools/writeMetaJson'), // = function(appJson, unitCode, config)
+  writeZipFile: require('./aggregationTools/writeZipFile') // = function(unitCode, config)
 };
 
 var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSites) {
@@ -33,6 +34,10 @@ var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSi
       'name': 'Generate Data from CartoDB',
       'task': tools.writeMetaJson,
       'params': ['{{GenerateSchema}}', unitCode, config]
+    }, {
+      'name': 'Generate zip file',
+      'task': tools.writeZipFile,
+      'params': [unitCode, config]
     }];
 
     // Add tools that will keep track of the status for status reporting
