@@ -1,0 +1,25 @@
+{
+  "appName": "NPMap Places-Mobile API",
+  "database": {
+    "cartodb": {
+      "account": "nps",
+      "apiKey": "./secrets/cartodb",
+      "type": "cartodb"
+    },
+    "defaults": {
+      "rootDirectory": "{{env.PWD}}/test/sql",
+      "delimiter": ";",
+      "fileDesignator": "file:///",
+      "fileOptions": {
+        "encoding": "utf8"
+      }
+    }
+  },
+  "debug": true,
+  "fileLocation": "/mnt/npmap/projects/places-mobile",
+  "htmlDirectory": "html",
+  "mapbox": {
+    "token": "./secrets/mapbox"
+  },
+  "tempFileLocation": "/home/npmap/places_mobile_tmp"
+}
