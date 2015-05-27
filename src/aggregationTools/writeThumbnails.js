@@ -9,6 +9,22 @@ var datawrap = require('datawrap'),
 
 datawrap.Bluebird.promisifyAll(fs);
 
+var moveAsync = function(source, dest) {
+  return new datawrap.Bluebird(function(fulfill, reject) {
+    var inputStream = fs.createReadStream(source);
+    var outputStream = fs.createWriteStream(dest);
+
+    inputStream.pipe(outputStream);
+    outputStream.on('error', function(e) {
+      reject(e);
+    });
+    inputStream.on('end', function() {
+      fs.unlinkSync(source);
+      fulfill();
+    });
+  });
+};
+
 // Offsets the marker from its lat/lon by and offset in pixels
 var addOffset = function(obj) {
   obj.longitudeMarker = obj.zoom && obj.markerOffsetX ? geoTools.addPixelsToLong(obj.markerOffsetX, obj.longitude, obj.zoom).toString() : obj.longitude;
@@ -50,7 +66,7 @@ var formatValue = function(value) {
 var getRequests = function(thumbnailList, unitCode, config) {
   var requestList = [];
   var settings = thumbnailSettings[unitCode] || thumbnailSettings['default'];
-  config.mapbox.token = fs.readFileSync(config.mapbox.token).toString().replace(/\n/g, '');
+  config.mapbox.token = config.mapbox.token.match('/secrets/') ? fs.readFileSync(config.mapbox.token).toString().replace(/\n/g, '') : config.mapbox.token;
   thumbnailList.map(function(img) {
     settings.map(function(setting) {
       var imgRequest = {
@@ -153,7 +169,7 @@ var moveFiles = function(fileList, config) {
     return new datawrap.Bluebird(function(fulfill, reject) {
       mkdirp(path.dirname(newName), function(error) {
         if (!error) {
-          fs.renameAsync(oldName, newName)
+          moveAsync(oldName, newName)
             .then(fulfill)
             .catch(reject);
         } else {
