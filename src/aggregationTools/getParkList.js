@@ -1,8 +1,10 @@
 // Requires
 var datawrap = require('datawrap');
 var config = require('../../config');
+var fs = require('fs');
 
 // Tools
+config.database.cartodb.apiKey = fs.readFileSync(config.database.cartodb.apiKey).toString();
 var database = datawrap(config.database.cartodb, config.database.defaults);
 var Bluebird = datawrap.Bluebird;
 

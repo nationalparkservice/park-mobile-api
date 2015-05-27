@@ -50,6 +50,7 @@ var formatValue = function(value) {
 var getRequests = function(thumbnailList, unitCode, config) {
   var requestList = [];
   var settings = thumbnailSettings[unitCode] || thumbnailSettings['default'];
+  config.mapbox.token = fs.readFileSync(config.mapbox.token).toString();
   thumbnailList.map(function(img) {
     settings.map(function(setting) {
       var imgRequest = {
