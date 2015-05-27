@@ -13,9 +13,11 @@ var success = function(taskName, res) {
 };
 
 var reportError = function(error, res) {
-  return res.send(JSON.stringify({
-    'Error': error
-  }, null, 2));
+  if (!res.headersSent) {
+    return res.send(JSON.stringify({
+      'Error': error
+    }, null, 2));
+  }
 };
 
 module.exports = function(req, res) {
