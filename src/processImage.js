@@ -2,20 +2,22 @@ var config = require('../config'),
   createUuid = require('./createUuid'),
   deleteImages = require('./deleteImages'),
   fs = require('fs'),
-  resizeImages = require('./resizeImages');
+  resizeImages = require('./resizeImages'),
+  resWrapper = require('./resWrapper');
 
 var success = function(uuid, res) {
-  return res.send(JSON.stringify({
+  return res.send({
     'uuid': uuid
-  }, null, 2));
+  });
 };
 var reportError = function(error, res) {
-  return res.send(JSON.stringify({
+  return res.error({
     'Error': error
-  }, null, 2));
+  });
 };
 
-module.exports = function(req, res) {
+module.exports = function(req, origRes) {
+  var res = resWrapper(req, origRes);
   var field = 'userPhoto', // The body field where to find the image
     uuid = (req.body.uuid && req.body.uuid.trim().length > 0) ? req.body.uuid : null,
     unitCode = req.body.unitCode;
