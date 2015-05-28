@@ -103,9 +103,7 @@ var getThumbnailData = function(media, sites, requestedSites) {
       // Check if there is a thumnail associated with this site
       if (checkField(sites[i], 'map_thumbnail_image') === thumbnailId) {
         // Check it we're requesting this thumbnail
-        console.log('We found a match, let\'s see if it\'s in the list', requestedSites, checkField(sites[i], 'id'));
         if (requestedSites === true || requestedSites.indexOf(checkField(sites[i], 'id')) >= 0) {
-          console.log('Adding ', checkField(sites[i], 'id'), 'to the list');
           return i;
         }
       }
