@@ -1,13 +1,16 @@
-var storage = require('node-persist');
+var storage = require('node-persist'),
+  resWrapper = require('./resWrapper');
 
-module.exports = function(req, res) {
+
+module.exports = function(req, origRes) {
+  var res = resWrapper(req, origRes);
   storage.initSync();
   if (req.params.process && storage.getItem(req.params.process)) {
     storage.getItem(req.params.process, function(err, value) {
       if (err) {
-        res.send(err);
+        res.error(err);
       } else {
-        res.send(value);
+        res.send({'status': value});
       }
     });
   } else {
