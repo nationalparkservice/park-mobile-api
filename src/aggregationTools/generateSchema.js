@@ -72,7 +72,6 @@ var tools = {
   },
   read: {
     schema: function(schemaPart, data, depth) {
-      console.log(tools.format.toArray(schemaPart.type));
       depth += 1; // Mostly for debugging
       var part,
         type = tools.format.toArray(schemaPart.type),
