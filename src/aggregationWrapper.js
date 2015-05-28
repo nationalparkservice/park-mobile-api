@@ -1,26 +1,23 @@
 var aggregate = require('./aggregate'),
   config = require('../config'),
-  createUuid = require('./createUuid');
+  createUuid = require('./createUuid'),
+resWrapper = require('./resWrapper');
+
 
 var success = function(taskName, res) {
-  if (!res.headersSent) {
-    return res.send(JSON.stringify({
-      'taskName': taskName
-    }, null, 2));
-  } else {
-    return false;
-  }
+  return res.send({
+    'taskName': taskName
+  });
 };
 
 var reportError = function(error, res) {
-  if (!res.headersSent) {
-    return res.send(JSON.stringify({
-      'Error': error
-    }, null, 2));
-  }
+  return res.error({
+    'Error': error
+  });
 };
 
-module.exports = function(req, res) {
+module.exports = function(req, origRes) {
+  var res = resWrapper(req, origRes);
   var taskName = createUuid();
   if (!(req.query && req.query.sync)) {
     success(taskName, res);
