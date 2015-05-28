@@ -1,4 +1,5 @@
-var Api = require('./src/api'),
+var allowXSS = require('./src/allowXSS'),
+  Api = require('./src/api'),
   config = require('./config'),
   express = require('express'),
   port = 3001;
@@ -6,6 +7,7 @@ var Api = require('./src/api'),
 var app = express(),
   api = new Api(config),
   apiRouter = express.Router();
+  allowXSS(apiRouter);
 
 config.htmlDirectory = __dirname + '/' + config.htmlDirectory;
 
