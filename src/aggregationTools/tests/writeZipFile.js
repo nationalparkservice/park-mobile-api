@@ -1,34 +1,34 @@
+var generateData = require('../generateData');
+var generateSchema = require('../generateSchema');
 var writeZipFile = require('../writeZipFile');
-var AdmZip = require('adm-zip');
-var glob = require('glob');
 var config = require('../../../config');
+var schemaFile = '../../../app.schema.json';
+var unitCode = 'klgo';
+var sizes = null; //['640', '768', '1536', '1080'];
 
-var unitCode = 'Brooklyn';
-
-var files = glob.sync('**', {
-  cwd: config.fileLocation + '/' + unitCode,
-  ignore: 'app.zip',
-  nodir: true
-});
-
-writeZipFile(unitCode, config)
-  .then(function(r) {
-    console.log('Zip File Created!', r);
-    var missingFiles = 0;
-    console.log(r);
-    var zip = new AdmZip(r);
-    var zippedFiles = zip.getEntries().map(function(entry) {
-      return entry.entryName;
-    });
-    files.forEach(function(file) {
-      if (zippedFiles.indexOf(file) < 0) {
-        console.log('Missing file: ', file);
-        missingFiles++;
-      }
-      console.log('Successfully zipped ', zippedFiles.length, 'of', files.length, 'files');
-    });
+console.log('Generating Data');
+generateData(schemaFile, unitCode, config)
+  .then(function(data) {
+    console.log('************* DATA COMPLETED ****************');
+    console.log('Schema Data');
+    generateSchema(data)
+      .then(function(appJson) {
+        console.log('************* SCHEMA COMPLETED ****************');
+        console.log('Thumbnail Data');
+        writeZipFile(appJson, unitCode, config, sizes)
+          .then(function(zipFileResult) {
+            console.log('************* All zip files COMPLETED ****************');
+            console.log('Success: ', zipFileResult);
+          })
+          .catch(function(e) {
+            console.log('All Thumbnail Error: ', e);
+            throw e;
+          });
+      })
+      .catch(function(e) {
+        console.log('Schema Error: ', e);
+      });
   })
   .catch(function(e) {
-    console.log('Error', e);
-    throw e;
+    console.log('Data Error: ', e);
   });
