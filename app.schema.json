@@ -6,7 +6,7 @@
     "format": "cartodb",
     "path": "places_mobile_parks",
     "sql": {
-      "fields": ["*", "ST_AsGeoJSON(ST_Envelope(the_geom)) AS \"bbox\"", "\"mapbox_id\""],
+      "fields": ["*", "ST_AsGeoJSON(ST_Envelope(the_geom)) AS \"bbox\""],
       "orderby": "",
       "table": "places_mobile_parks",
       "url": "https://nps.cartodb.com/api/v1/sql?&q=",
@@ -44,6 +44,11 @@
           }
         }
       }
+    },
+    "bbox": {
+      "noColumn": true,
+      "description": "JSON Representation of the bounding box",
+      "type": ["string", "null"]
     },
     "categories": {
       "description": "Categories that are associated with the sites",
@@ -151,6 +156,10 @@
       "items": {
         "type": ["number", "null"]
       }
+    },
+    "mapbox_id": {
+      "description": "Identifier for the mapbox basemap",
+      "type": ["string", "null"]
     },
     "map_thumbnail_zoom": {
       "description": "The zoom level used for the thumbnail images",
