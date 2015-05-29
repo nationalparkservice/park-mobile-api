@@ -21,5 +21,100 @@
   "mapbox": {
     "token": "./secrets/mapbox"
   },
-  "tempFileLocation": "/home/npmap/places_mobile_tmp"
+  "tempFileLocation": "/home/npmap/places_mobile_tmp",
+  "zipFields": {
+    "640": {
+      "commonImage": "image_640",
+      "video": "relative_url",
+      "audio": "relative_url",
+      "exploreSiteThumbnail": "image_640",
+      "exploreSiteThumbnailAndroid": "image_640",
+      "mapThumbnail": "image_thumbnail_2x",
+      "tourThumbnail": "image_350",
+      "inTourThumbnail": "image_350",
+      "inTourGallery": "image_640",
+      "inTourGalleryAndroid": "image_640",
+      "serviceIcon": "icon_@2x"
+    },
+    "768": {
+      "commonImage": "image_768",
+      "video": "relative_url",
+      "audio": "relative_url",
+      "exploreSiteThumbnail": "image_350",
+      "exploreSiteThumbnailAndroid": "image_768",
+      "mapThumbnail": "image_thumbnail_2x",
+      "tourThumbnail": "image_350",
+      "inTourThumbnail": "image_350",
+      "inTourGallery": "image_480",
+      "inTourGalleryAndroid": "image_768",
+      "serviceIcon": "icon_@2x"
+    },
+    "1536": {
+      "commonImage": "image_1536",
+      "video": "relative_url",
+      "audio": "relative_url",
+      "exploreSiteThumbnail": "image_640",
+      "exploreSiteThumbnailAndroid": "image_1536",
+      "mapThumbnail": "image_thumbnail_2x",
+      "tourThumbnail": "image_350",
+      "inTourThumbnail": "image_350",
+      "inTourGallery": "image_960",
+      "inTourGalleryAndroid": "image_1536",
+      "serviceIcon": "icon_@2x"
+    },
+    "1080": {
+      "commonImage": "image_1080",
+      "video": "relative_url",
+      "audio": "relative_url",
+      "exploreSiteThumbnail": "image_1080",
+      "exploreSiteThumbnailAndroid": "image_1080",
+      "mapThumbnail": "image_thumbnail_2x",
+      "tourThumbnail": "image_350",
+      "inTourThumbnail": "image_350",
+      "inTourGallery": "image_1080",
+      "inTourGalleryAndroid": "image_1080",
+      "serviceIcon": "icon_@2x"
+    }
+  },
+  "zipTemplate": {
+    "commonImage": {
+      "type": "image"
+    },
+    "video": {
+      "type": "video"
+    },
+    "audio": {
+      "type": "audio"
+    },
+    "exploreSiteThumbnail": {
+      "reference": "sites.primary_image",
+      "type": "image"
+    },
+    "exploreSiteThumbnailAndroid": {
+      "reference": "sites.primary_image",
+      "type": "image"
+    },
+    "mapThumbnail": {
+      "type": "map_thumbnail"
+    },
+    "tourThumbnail": {
+      "reference": "tours.primary_image",
+      "type": "image"
+    },
+    "inTourThumbnail": {
+      "reference": "tours.sites.primary_image",
+      "type": "image"
+    },
+    "inTourGallery": {
+      "type": "image"
+    },
+    "inTourGalleryAndroid": {
+      "reference": "tours.sites.media.primary_image",
+      "type": "image"
+    },
+    "serviceIcon": {
+      "reference": "sites.services",
+      "type": "icon"
+    }
+  }
 }
