@@ -58,13 +58,13 @@ module.exports = function(req, res) {
       });
   } else {
     if (req.method === 'DELETE' || req.body.del === 'DELETE') {
-      reportError('A uuid is required to delete an image');
+      reportError('A uuid is required to delete an image', res);
     } else if (!unitCode) {
-      reportError('You must include a unit code in order to upload an image');
+      reportError('You must include a unit code in order to upload an image', res);
     } else if (!req.files[field]) {
-      reportError('You must include a file to be uploaded');
+      reportError('You must include a file to be uploaded', res);
     } else {
-      reportError('Unknown error');
+      reportError('Unknown error', res);
     }
   }
 };
