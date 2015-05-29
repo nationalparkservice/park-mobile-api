@@ -13,7 +13,7 @@ npm install -g forever-service
 git clone https://github.com/nationalparkservice/places-mobile-api.git
 cd ./places-mobile-api
 npm install
-sudo forever-service install places-mobile-api --script index.js
+sudo forever-service install places-mobile-api --script app.js
 ```
 
 ### Using Forever, restarting the service
