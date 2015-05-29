@@ -6,6 +6,7 @@
     "format": "cartodb",
     "path": "places_mobile_parks",
     "sql": {
+      "fields": ["*", "ST_AsGeoJSON(ST_Envelope(the_geom)) AS \"bbox\"", "\"mapbox_id\""]
       "orderby": "",
       "table": "places_mobile_parks",
       "url": "https://nps.cartodb.com/api/v1/sql?&q=",
