@@ -116,5 +116,21 @@
       "reference": "sites.services",
       "type": "icon"
     }
+  },
+  "testZipTemplate": {
+    "video": {
+      "type": "video"
+    },
+    "audio": {
+      "type": "audio"
+    },
+    "exploreSiteThumbnail": {
+      "reference": "sites.primary_image",
+      "type": "image"
+    },
+    "exploreSiteThumbnailAndroid": {
+      "reference": "sites.primary_image",
+      "type": "image"
+    }
   }
 }

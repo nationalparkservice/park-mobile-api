@@ -1,6 +1,7 @@
 var Bluebird = require('datawrap').Bluebird;
 var mkdirp = require('mkdirp');
 var AdmZip = require('adm-zip');
+var path = require('path');
 
 var cleanArray = function(array) {
   //removes nulls and duplicates
@@ -97,16 +98,19 @@ module.exports = function(appJson, unitCode, config, sizes) {
           }
         }
         fileList.forEach(function(file) {
-          var path = file.replace(config.fileLocation + '/', '');
-          if (path.substr(0, 5) !== 'icons') {
-            path = path.replace(/^.+?\//g, '');
+          var filePath = file.replace(config.fileLocation + '/', '');
+          if (filePath.substr(0, 5) !== 'icons') {
+            filePath = filePath.replace(/^.+?\//g, '');
           }
+          console.log(filePath, path.dirname(filePath));
+          filePath = path.dirname(filePath);
           try {
-            zip.addLocalFile(file, path);
+            zip.addLocalFile(file, filePath);
           } catch (e) {
             errorList.push(e);
           }
         });
+
         zip.writeZip(archiveDirectory + size + '.zip');
         allFiles[size] = allFiles[size] || {};
         allFiles[size].results = fileList;

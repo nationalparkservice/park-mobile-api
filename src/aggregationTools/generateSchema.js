@@ -84,6 +84,9 @@ var tools = {
           } else {
             part[field] = tools.read.value(schemaPart, data, field, null);
           }
+          if (part[field] === null) {
+            delete part[field];
+          }
         }
       } else if (type.indexOf('array') > -1) {
         // This will loop through the json file
