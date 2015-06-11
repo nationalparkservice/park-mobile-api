@@ -75,17 +75,19 @@ var tools = {
       depth += 1; // Mostly for debugging
       var part,
         type = tools.format.toArray(schemaPart.type),
-        field;
+        field,
+        tmp;
       if (type.indexOf('object') > -1) {
         part = {};
         for (field in schemaPart.properties) {
+          tmp = null;
           if (schemaPart.properties[field].type.indexOf('object') > -1 || schemaPart.properties[field].type.indexOf('array') > -1) {
             part[field] = tools.read.schema(schemaPart.properties[field], data, depth);
           } else {
-            part[field] = tools.read.value(schemaPart, data, field, null);
-          }
-          if (part[field] === null) {
-            delete part[field];
+            tmp = tools.read.value(schemaPart, data, field, null);
+            if (tmp !== null && tmp !== undefined) {
+              part[field] = tmp;
+            }
           }
         }
       } else if (type.indexOf('array') > -1) {
@@ -126,6 +128,7 @@ var tools = {
         for (field in properties) {
           alias = properties[field].alias || field;
           row[field] = tools.format.value(record[alias], properties[field].type, properties[field].transformation, properties[field], data);
+          if (row[field] === null) {delete row[field];}
         }
         // Allow the option to only have one value in the object
         if (schemaPart.items && schemaPart.items.transformation === 'value') {

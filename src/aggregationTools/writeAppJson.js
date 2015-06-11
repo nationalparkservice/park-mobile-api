@@ -12,9 +12,13 @@ module.exports = function(appJson, unitCode, config) {
       if (err) {
         reject(err);
       } else {
-        fs.writeFileAsync(filePath, JSON.stringify(appJson, null, 2))
+        fs.writeFileAsync(filePath, JSON.stringify(appJson, null, 2), {
+            'encoding': 'utf8'
+          })
           .then(function(r) {
-            fs.writeFileAsync(minFilePath, JSON.stringify(appJson))
+            fs.writeFileAsync(minFilePath, JSON.stringify(appJson), {
+                'encoding': 'utf8'
+              })
               .then(function(r2) {
                 fulfill([r, r2]);
               })
