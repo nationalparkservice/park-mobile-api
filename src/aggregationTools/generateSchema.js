@@ -115,14 +115,14 @@ var tools = {
         });
         var temp = [];
         // Set the order for the data (this is done after the filter because it needs to loop through far less items)
-        filterBy.values.map(function(id) {
-          jsonFile.map(function(d) {
+        filterBy.values.forEach(function(id) {
+          jsonFile.forEach(function(d) {
             if (d[filterBy.field].toString() === id) temp.push(d);
           });
         });
         jsonFile = temp;
       }
-      jsonFile.map(function(record) {
+      jsonFile.forEach(function(record) {
         var row = {},
           alias,
           field,
@@ -138,7 +138,9 @@ var tools = {
         if (schemaPart.items && schemaPart.items.transformation === 'value') {
           row = row[field];
         }
-        rows.push(row);
+        if (row !== null) {
+          rows.push(row);
+        }
       });
       return rows;
     },
