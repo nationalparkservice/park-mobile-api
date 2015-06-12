@@ -27,8 +27,10 @@ var tools = {
               'values': tempValue
             });
           } else {
-            tempValue.map(function(v) {
-              returnValue.push(tools.format.number(v));
+            tempValue.forEach(function(v) {
+              if (v !== = null && v !== undefined) {
+                returnValue.push(tools.format.number(v));
+              }
             });
           }
         } else {
@@ -128,7 +130,9 @@ var tools = {
         for (field in properties) {
           alias = properties[field].alias || field;
           row[field] = tools.format.value(record[alias], properties[field].type, properties[field].transformation, properties[field], data);
-          if (row[field] === null) {delete row[field];}
+          if (row[field] === null) {
+            delete row[field];
+          }
         }
         // Allow the option to only have one value in the object
         if (schemaPart.items && schemaPart.items.transformation === 'value') {
