@@ -28,7 +28,7 @@ var tools = {
             });
           } else {
             tempValue.forEach(function(v) {
-              if (v !== = null && v !== undefined) {
+              if (v !== null && v !== undefined) {
                 returnValue.push(tools.format.number(v));
               }
             });
