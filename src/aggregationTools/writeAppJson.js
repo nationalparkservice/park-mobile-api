@@ -4,6 +4,12 @@ var path = require('path');
 var fs = require('fs');
 Bluebird.promisifyAll(fs);
 
+var bomify = function(text) {
+  // Add the utf8 Byte Order Mark
+  // https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
+  return '\uFEFF' + text.replace(/^\uFEFF/, '');
+};
+
 module.exports = function(appJson, unitCode, config) {
   return new Bluebird(function(fulfill, reject) {
     var filePath = config.fileLocation + '/' + unitCode + '/app.json';
@@ -12,13 +18,9 @@ module.exports = function(appJson, unitCode, config) {
       if (err) {
         reject(err);
       } else {
-        fs.writeFileAsync(filePath, JSON.stringify(appJson, null, 2), {
-            'encoding': 'utf8'
-          })
+        fs.writeFileAsync(filePath, bomify(JSON.stringify(appJson, null, 2)), 'utf8')
           .then(function(r) {
-            fs.writeFileAsync(minFilePath, JSON.stringify(appJson), {
-                'encoding': 'utf8'
-              })
+            fs.writeFileAsync(minFilePath, bomify(JSON.stringify(appJson)), 'utf8')
               .then(function(r2) {
                 fulfill([r, r2]);
               })
