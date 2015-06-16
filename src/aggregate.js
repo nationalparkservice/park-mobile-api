@@ -18,7 +18,9 @@ var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSi
     var taskList = [{
       'name': 'StartDate',
       'task': function() {
-        return new Date();
+        return new datawrap.Bluebird(function(fulfill) {
+          fulfill(new Date());
+        });
       },
       'params': [],
     }, {
