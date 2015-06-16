@@ -104,6 +104,8 @@ module.exports = function(appJson, unitCode, config, sizes) {
           }
           console.log(filePath, path.dirname(filePath));
           filePath = path.dirname(filePath);
+          // Put all the files in the root
+          filePath = '';
           try {
             zip.addLocalFile(file, filePath);
           } catch (e) {
