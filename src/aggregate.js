@@ -9,12 +9,19 @@ var tools = {
   writeThumbnails: require('./aggregationTools/writeThumbnails'), // = function(config, unitCode, AppJson)
   writeAppJson: require('./aggregationTools/writeAppJson'), // = function(AppJson, unitCode, config)
   writeMetaJson: require('./aggregationTools/writeMetaJson'), // = function(appJson, unitCode, config)
-  writeZipFile: require('./aggregationTools/writeZipFile') // = function(appJson, unitCode, config, sizes)
+  writeZipFile: require('./aggregationTools/writeZipFile'), // = function(appJson, unitCode, config, sizes)
+  purgeCache: require('./aggregationTools/purgeCache') // = function(startDate, unitCode, config)
 };
 
 var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSites) {
   return new datawrap.Bluebird(function(fulfill, reject) {
     var taskList = [{
+      'name': 'StartDate',
+      'task': function() {
+        return new Date();
+      },
+      'params': [],
+    }, {
       'name': 'GenerateData',
       'task': tools.generateData,
       'params': [schemaPath, unitCode, config]
@@ -38,6 +45,10 @@ var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSi
       'name': 'Generate zip file',
       'task': tools.writeZipFile,
       'params': ['{{GenerateSchema}}', unitCode, config]
+    }, {
+      'name': 'Purge Cached Data',
+      'task': tools.purgeCache,
+      'params': ['{{startDate}}', unitCode, config]
     }];
 
     // Add tools that will keep track of the status for status reporting
