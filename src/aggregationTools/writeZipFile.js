@@ -102,11 +102,12 @@ module.exports = function(appJson, unitCode, config, sizes) {
           if (filePath.substr(0, 5) !== 'icons') {
             filePath = filePath.replace(/^.+?\//g, '');
           }
-          console.log(filePath, path.dirname(filePath));
+          // console.log(filePath, path.dirname(filePath));
           filePath = path.dirname(filePath);
           // Put all the files in the root
-          filePath = '';
+          filePath = filePath.replace(/^.+?\/|^.+/g, '');
           try {
+            // console.log(file, filePath);
             zip.addLocalFile(file, filePath);
           } catch (e) {
             errorList.push(e);
