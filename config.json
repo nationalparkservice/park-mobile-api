@@ -1,5 +1,6 @@
 {
   "appName": "NPMap Places-Mobile API",
+  "cacheResetUrl": "http://ncrcms.nps.doi.net/purge/akam_build_eccu.jsp?path={{path}}&email=&Submit=Submit",
   "database": {
     "cartodb": {
       "account": "nps",
