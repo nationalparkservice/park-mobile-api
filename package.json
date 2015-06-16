@@ -28,8 +28,9 @@
     "express": "4.12.4",
     "glob": "5.0.10",
     "magic-resize": "git+http://github.com/jimmyrocks/magick-resize",
-    "mkdirp": "0.5.1",
     "method-override": "2.3.3",
+    "mkdirp": "0.5.1",
+    "moment": "2.10.3",
     "multer": "0.1.8",
     "node-persist": "0.0.3"
   }
