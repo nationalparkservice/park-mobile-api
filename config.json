@@ -107,10 +107,11 @@
       "type": "image"
     },
     "inTourGallery": {
+      "reference": "tours.sites.media",
       "type": "image"
     },
     "inTourGalleryAndroid": {
-      "reference": "tours.sites.media.primary_image",
+      "reference": "tours.sites.media",
       "type": "image"
     },
     "serviceIcon": {
