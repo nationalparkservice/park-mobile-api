@@ -1,29 +1,9 @@
 var datawrap = require('datawrap'),
   fs = require('fs'),
   glob = require('glob'),
-  http = require('http');
-// moment =require('moment');
-
-var getUrl = function(url) {
-  return new datawrap.Bluebird(function(fulfill, reject) {
-    http.get(url, fulfill)
-      .on('error', reject);
-  });
-};
+  updateList = require('../purgeFile');
 
 module.exports = function(startDate, unitCode, config) {
-  var createPurgeTasklist = function(filePath) {
-    var url = datawrap.fandlebars(config.cacheResetUrl, {
-      'unitCode': unitCode,
-      'path': encodeURIComponent(filePath.replace(/^\//, ''))
-    });
-    return {
-      'name': 'Update ' + filePath,
-      'task': getUrl,
-      'params': [url]
-    };
-  };
-
   return new datawrap.Bluebird(function(fulfill, reject) {
     var updatedFiles = [];
     var updateDirectory = config.fileLocation + '/' + unitCode;
@@ -36,7 +16,7 @@ module.exports = function(startDate, unitCode, config) {
         updatedFiles = fileList.filter(function(f) {
           return fs.statSync(updateDirectory + '/' + f).mtime >= startDate;
         });
-        datawrap.runList(updatedFiles.map(createPurgeTasklist))
+        updateList(updatedFiles, unitCode, config)
           .then(function() {
             fulfill(updatedFiles);
           })
