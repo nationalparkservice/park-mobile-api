@@ -14,6 +14,8 @@ module.exports = function(options) {
     }, function(err, files) {
       if (err) {
         reject(err);
+      } else if (files.length === 0) {
+        reject('Image (' + uuid + ') does not exist');
       } else {
         var taskList = files.map(function(file) {
           return {
