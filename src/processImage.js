@@ -19,7 +19,8 @@ var reportError = function(error, res) {
 module.exports = function(req, origRes) {
   var res = resWrapper(req, origRes);
   var field = 'userPhoto', // The body field where to find the image
-    uuid = (req.body.uuid && req.body.uuid.trim().length > 0) ? req.body.uuid : null,
+    inUuid = req.param('imageId') || req.body.uuid,
+    uuid = (inUuid && inUuid.trim().length > 0) ? inUuid : null,
     unitCode = req.body.unitCode;
 
   if (req.files[field] && unitCode && req.method !== 'DELETE' && req.body.del !== 'DELETE') {
@@ -43,7 +44,7 @@ module.exports = function(req, origRes) {
           reportError(err, res);
         });
       });
-  } else if (req.body.uuid && (req.method === 'DELETE' || req.body.del === 'DELETE')) {
+  } else if (uuid && (req.method === 'DELETE' || req.body.del === 'DELETE')) {
     // Delete an image
     if (req.files[field] && req.files[field].path) {
       fs.unlinkSync(req.files[field].path);
