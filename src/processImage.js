@@ -2,20 +2,38 @@ var config = require('../config'),
   createUuid = require('./createUuid'),
   deleteImages = require('./deleteImages'),
   fs = require('fs'),
+  purgeFile = require('./purgeFile'),
   resizeImages = require('./resizeImages'),
-  resWrapper = require('./resWrapper');
+  resWrapper = require('./resWrapper'),
 
-var success = function(uuid, res) {
-  return res.send({
-    'uuid': uuid
-  });
-};
-var reportError = function(error, res) {
-  console.log('Error:', error);
-  return res.error({
-    'Error': error
-  });
-};
+  success = function(uuid, res) {
+    return res.send({
+      'uuid': uuid
+    });
+  },
+
+  reportError = function(error, res) {
+    console.log('Error:', error);
+    return res.error({
+      'Error': error
+    });
+  },
+
+  purgeList = function(uuid, unitCode, res, data) {
+    var rootDirectory = config.fileLocation + '/' + unitCode + '/',
+      fileList = data.filter(function(a) {
+        return a.file;
+      }).map(function(b) {
+        return b.file.replace(rootDirectory, '');
+      });
+    purgeFile(fileList, unitCode, config)
+      .then(function() {
+        success(uuid, res);
+      })
+      .catch(function(e) {
+        reportError(e, res);
+      });
+  };
 
 module.exports = function(req, origRes) {
   var res = resWrapper(req, origRes);
@@ -35,8 +53,8 @@ module.exports = function(req, origRes) {
         'mediaDirectory': config.fileLocation + '/' + unitCode + '/media/',
         'uuid': uuid
       })
-      .then(function() {
-        success(uuid, res);
+      .then(function(data) {
+        purgeList(uuid, unitCode, res, data);
       })
       .catch(function(err) {
         // Delete the original file
@@ -55,8 +73,8 @@ module.exports = function(req, origRes) {
         'uuid': uuid,
         'unitCode': unitCode
       })
-      .then(function() {
-        success(uuid, res);
+      .then(function(data) {
+        purgeList(uuid, unitCode, res, data);
       })
       .catch(function(err) {
         reportError(err, res);
