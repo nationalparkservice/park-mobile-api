@@ -26,12 +26,18 @@ module.exports = function(args) {
           } else {
             if (args._deleteOriginal) {
               fs.unlinkAsync(newArgs.f).then(function() {
-                fulfill(r);
+                fulfill({
+                  result: r,
+                  file: args.o
+                });
               }).catch(function(e) {
                 reject(e);
               });
             } else {
-              fulfill(r);
+              fulfill({
+                result: r,
+                file: args.o
+              });
             }
           }
         });
