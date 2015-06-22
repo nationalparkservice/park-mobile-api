@@ -20,7 +20,17 @@ module.exports = function(options) {
         var taskList = files.map(function(file) {
           return {
             'name': 'Remove file ' + file,
-            'task': fs.unlinkAsync,
+            'task': function(f) {
+              return new datawrap.Bluebird(function(f2, r2) {
+                fs.unlinkAsync(f)
+                  .then(function() {
+                    f2({
+                      file: f
+                    });
+                  })
+                  .catch(r2);
+              });
+            },
             'params': [mediaDirectory + file]
           };
         });
