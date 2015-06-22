@@ -20,7 +20,7 @@ var reportError = function(error, res) {
 module.exports = function(req, origRes) {
   var res = resWrapper(req, origRes);
   var field = 'userPhoto', // The body field where to find the image
-    inUuid = req.params.imageId || req.body.uuid || req.body.query.uuid || req.body.query.imageId,
+    inUuid = req.params.imageId || req.body.uuid || (req.body.query && (req.body.query.uuid || req.body.query.imageId)),
     uuid = (inUuid && inUuid.trim().length > 0) ? inUuid : null,
     unitCode = req.body.unitCode;
 
