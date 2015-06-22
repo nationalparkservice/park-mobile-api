@@ -11,6 +11,7 @@ var success = function(uuid, res) {
   });
 };
 var reportError = function(error, res) {
+  console.log('Error:', error);
   return res.error({
     'Error': error
   });
@@ -19,7 +20,7 @@ var reportError = function(error, res) {
 module.exports = function(req, origRes) {
   var res = resWrapper(req, origRes);
   var field = 'userPhoto', // The body field where to find the image
-    inUuid = req.param('imageId') || req.body.uuid,
+    inUuid = req.params.imageId || req.body.uuid || req.body.query.uuid || req.body.query.imageId,
     uuid = (inUuid && inUuid.trim().length > 0) ? inUuid : null,
     unitCode = req.body.unitCode;
 
@@ -44,14 +45,15 @@ module.exports = function(req, origRes) {
           reportError(err, res);
         });
       });
-  } else if (uuid && (req.method === 'DELETE' || req.body.del === 'DELETE')) {
+  } else if (uuid && unitCode && (req.method === 'DELETE' || req.body.del === 'DELETE')) {
     // Delete an image
     if (req.files[field] && req.files[field].path) {
       fs.unlinkSync(req.files[field].path);
     }
     deleteImages({
-        'mediaDirectory': config.fileLocation + '/' + unitCode + '/media/',
-        'uuid': uuid
+        'mediaDirectory': config.fileLocation + '/{{unitCode}}/media/',
+        'uuid': uuid,
+        'unitCode': unitCode
       })
       .then(function() {
         success(uuid, res);
@@ -61,7 +63,13 @@ module.exports = function(req, origRes) {
       });
   } else {
     if (req.method === 'DELETE' || req.body.del === 'DELETE') {
-      reportError('A uuid is required to delete an image', res);
+      if (!uuid) {
+        reportError('A uuid is required to delete an image', res);
+      } else if (!unitCode) {
+        reportError('A unit code is required to delete an image', res);
+      } else {
+        reportError('Request is missing a required field', res);
+      }
     } else if (!unitCode) {
       reportError('You must include a unit code in order to upload an image', res);
     } else if (!req.files[field]) {

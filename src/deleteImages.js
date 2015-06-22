@@ -5,7 +5,7 @@ var glob = require('glob');
 datawrap.Bluebird.promisifyAll(fs);
 
 module.exports = function(options) {
-  var mediaDirectory = options.mediaDirectory,
+  var mediaDirectory = datawrap.fandlebars(options.mediaDirectory, options),
     uuid = options.uuid;
 
   return new datawrap.Bluebird(function(fulfill, reject) {
