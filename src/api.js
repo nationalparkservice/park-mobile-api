@@ -31,6 +31,18 @@
       'path': '/image/:imageId',
       'process': [imageMulter, processImage]
     }, {
+      'name': 'PUT image',
+      'description': 'Same as POST image, but updates an existing image',
+      'method': 'PUT',
+      'path': '/image/:unitCode/:imageId',
+      'process': [imageMulter, processImage]
+    }, {
+      'name': 'DELETE image',
+      'description': 'Removes an image from the server',
+      'method': 'DELETE',
+      'path': '/image/:unitCode/:imageId',
+      'process': [imageMulter, processImage]
+    }, {
       'name': 'GET generate/json',
       'description': 'Regenerates the app.json and meta.json for all parks',
       'method': 'GET',

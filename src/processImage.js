@@ -22,7 +22,7 @@ module.exports = function(req, origRes) {
   var field = 'userPhoto', // The body field where to find the image
     inUuid = req.params.imageId || req.body.uuid || (req.body.query && (req.body.query.uuid || req.body.query.imageId)),
     uuid = (inUuid && inUuid.trim().length > 0) ? inUuid : null,
-    unitCode = req.body.unitCode;
+    unitCode = req.body.unitCode || req.params.unitCode;
 
   if (req.files[field] && unitCode && req.method !== 'DELETE' && req.body.del !== 'DELETE') {
     // Resize Image
