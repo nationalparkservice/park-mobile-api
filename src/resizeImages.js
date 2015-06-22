@@ -5,12 +5,12 @@ var datawrap = require('datawrap'),
 module.exports = function(options) {
   var filePath = options.file,
     fileTypes = options.fileTypes,
-    mediaDirectory = options.mediaDirectory,
+    mediaDirectory = options.mediaDirectory.replace(/(\/$)/g,'') + '/',
     uuid = options.uuid;
 
   return new datawrap.Bluebird(function(fulfill, reject) {
     var taskList = fileTypes.map(function(type, index) {
-      var outputFile = mediaDirectory + '/' + uuid + '_' + type + path.extname(filePath);
+      var outputFile = mediaDirectory + uuid + '_' + type + path.extname(filePath);
       return {
         'name': 'Resize to ' + type,
         'task': magickResizeWrapper,
