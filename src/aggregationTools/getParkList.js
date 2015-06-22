@@ -11,7 +11,7 @@ var Bluebird = datawrap.Bluebird;
 module.exports = function(unitCode) {
   return new Bluebird(function(fulfill, reject) {
     var fieldName = 'unit_code',
-      parksQuery = 'SELECT DISTINCT {{fieldName}} FROM places_mobile_parks WHERE is_demo = false';
+      parksQuery = 'SELECT DISTINCT {{fieldName}} FROM places_mobile_parks';
     //fulfill(Array.isArray(unitCode) ? unitCode : [unitCode]);
     database.runQuery(parksQuery, {
         fieldName: fieldName
