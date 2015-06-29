@@ -19,7 +19,14 @@ var config = require('../config'),
     });
   },
 
+  writeDebug = function(message, req) {
+    if (config.debug) {
+      console.log(new Date(), req ? req.connection.remoteAddress : '', message);
+    }
+  },
+
   purgeList = function(uuid, unitCode, res, data) {
+    writeDebug('purging for uuid ' + uuid + ' and unit code ' + unitCode);
     var rootDirectory = config.fileLocation + '/' + unitCode + '/',
       fileList = data.filter(function(a) {
         return a.file;
@@ -47,6 +54,7 @@ module.exports = function(req, origRes) {
     // We have files, a unitCode, and we're not trying to delete
     // Get the uuid or create one
     uuid = uuid || createUuid();
+    writeDebug('Creating with uuid ' + uuid, req);
     resizeImages({
         'file': req.files[field].path,
         'fileTypes': Array.isArray(req.body.types) ? req.body.types : [req.body.types],
@@ -64,6 +72,7 @@ module.exports = function(req, origRes) {
         });
       });
   } else if (uuid && unitCode && (req.method === 'DELETE' || req.body.del === 'DELETE')) {
+    writeDebug('Deleting with uuid ' + uuid, req);
     // Delete an image
     if (req.files[field] && req.files[field].path) {
       fs.unlinkSync(req.files[field].path);
@@ -80,6 +89,7 @@ module.exports = function(req, origRes) {
         reportError(err, res);
       });
   } else {
+    writeDebug('There is an error ' + uuid, req);
     if (req.method === 'DELETE' || req.body.del === 'DELETE') {
       if (!uuid) {
         reportError('A uuid is required to delete an image', res);
