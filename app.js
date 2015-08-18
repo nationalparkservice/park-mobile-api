@@ -2,7 +2,7 @@ var allowXSS = require('./src/allowXSS'),
   Api = require('./src/api'),
   config = require('./config'),
   express = require('express'),
-  port = 3001;
+  port = config.port || 3002;
 
 var app = express(),
   api = new Api(config),
