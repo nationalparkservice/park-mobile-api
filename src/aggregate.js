@@ -1,5 +1,6 @@
-var datawrap = require('datawrap'),
-  addStatusTools = require('./addStatuses');
+var datawrap = require('datawrap');
+var checkMountStatus = require('./checkMountStatus');
+var addStatusTools = require('./addStatuses');
 
 // Require the external tools
 var tools = {
@@ -13,16 +14,16 @@ var tools = {
   purgeCache: require('./aggregationTools/purgeCache') // = function(startDate, unitCode, config)
 };
 
-var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSites) {
-  return new datawrap.Bluebird(function(fulfill, reject) {
+var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailSites) {
+  return new datawrap.Bluebird(function (fulfill, reject) {
     var taskList = [{
       'name': 'StartDate',
-      'task': function() {
-        return new datawrap.Bluebird(function(fulfill) {
+      'task': function () {
+        return new datawrap.Bluebird(function (fulfill) {
           fulfill(new Date());
         });
       },
-      'params': [],
+      'params': []
     }, {
       'name': 'GenerateData',
       'task': tools.generateData,
@@ -56,17 +57,23 @@ var aggregatePark = function(schemaPath, unitCode, config, taskName, thumbnailSi
     // Add tools that will keep track of the status for status reporting
     taskList = addStatusTools(taskList, taskName);
 
-    datawrap.runList(taskList)
-      .then(fulfill)
-      .catch(reject);
+    checkMountStatus(config, function (mountE, mountR) {
+      if (!mountE && mountR) {
+        datawrap.runList(taskList)
+          .then(fulfill)
+          .catch(reject);
+      } else {
+        reject('Error mounting drive: ' + mountE);
+      }
+    });
   });
 };
 
-module.exports = function(schemaPath, unitCodes, config, taskName, thumbnailSites) {
-  return new datawrap.Bluebird(function(resolve, reject) {
+module.exports = function (schemaPath, unitCodes, config, taskName, thumbnailSites) {
+  return new datawrap.Bluebird(function (resolve, reject) {
     tools.getParkList(unitCodes)
-      .then(function(validParkList) {
-        var taskList = validParkList.map(function(unitCode) {
+      .then(function (validParkList) {
+        var taskList = validParkList.map(function (unitCode) {
           return {
             'name': 'Aggregate ' + unitCode,
             'task': aggregatePark,
