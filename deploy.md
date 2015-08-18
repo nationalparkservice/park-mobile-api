@@ -25,6 +25,9 @@ Status  - "sudo status places-mobile-api"
 Restart - "sudo restart places-mobile-api"
 ```
 
+### Mounting external drives
+To mount external drives, use [this guide](https://wiki.ubuntu.com/MountWindowsSharesPermanently)
+
 #### Note:
 "restart service" command works like stop in Ubuntu due to bug in upstart https://bugs.launchpad.net/upstart/+bug/703800
 
