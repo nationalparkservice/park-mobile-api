@@ -1,5 +1,6 @@
 {
   "appName": "NPMap Places-Mobile API",
+  "port": 3002,
   "cacheResetUrl": "http://ncrcms.nps.doi.net/purge/akam_build_eccu.jsp?path=%2Fnpmap%2Fprojects%2Fplaces-mobile%2F{{unitCode}}%2F{{path}}&email=&Submit=Submit",
   "database": {
     "cartodb": {
@@ -18,6 +19,7 @@
   },
   "debug": true,
   "fileLocation": "/mnt/npmap/projects/places-mobile",
+  "testFileLocation": "/mnt/npmap/projects/places-mobile/test.txt",
   "htmlDirectory": "html",
   "mapbox": {
     "token": "./secrets/mapbox"
