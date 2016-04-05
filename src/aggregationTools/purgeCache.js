@@ -14,7 +14,7 @@ module.exports = function(startDate, unitCode, config) {
         reject(err);
       } else {
         updatedFiles = fileList.filter(function(f) {
-          return fs.statSync(updateDirectory + '/' + f).mtime >= startDate;
+          return f.substr(-5) === '.json' || fs.statSync(updateDirectory + '/' + f).mtime >= startDate;
         });
         updateList(updatedFiles, unitCode, config)
           .then(function() {
