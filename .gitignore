@@ -1,5 +1,5 @@
+.edgerc
 node_modules
 secrets
-secrets.json
 npm-debug.log
 persist

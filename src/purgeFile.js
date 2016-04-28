@@ -1,9 +1,11 @@
-var akamai = require('akamai');
 var datawrap = require('datawrap');
-var secrets = require('./secrets.json');
+var EdgeGrid = require('edgegrid');
+var eg = new EdgeGrid({
+  path: './.edgerc'
+});
 
 function createPurgePath (filePath, unitCode) {
-  return '/npmap/projects/places-mobile/' + unitCode + '/' + filePath;
+  return 'https://www.nps.gov/npmap/projects/places-mobile/' + unitCode + '/' + filePath;
 }
 function updateList (fileList, unitCode, config) {
   var length = fileList.length;
@@ -15,12 +17,25 @@ function updateList (fileList, unitCode, config) {
   }
 
   return new datawrap.Bluebird(function (fulfill, reject) {
-    akamai
-      .purge(secrets.user, secrets.access_token, fileList, {
-        action: 'invalidate'
-      })
-      .then(fulfill)
-      .catch(reject);
+    eg.auth({
+      body: {
+        action: 'invalidate',
+        objects: fileList
+      },
+      path: '/ccu/v2/queues/default',
+      method: 'POST'
+    });
+    eg.send(function (data, response) {
+      if (response && response.body) {
+        response = JSON.parse(response.body);
+
+        if (response.purgeId) {
+          console.log('success');
+        } else {
+          console.log('error');
+        }
+      }
+    });
   });
 }
 

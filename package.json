@@ -27,10 +27,10 @@
   },
   "dependencies": {
     "adm-zip": "0.4.7",
-    "akamai": "^0.10.1",
     "bluebird": "3.3.5",
     "btoa": "1.1.2",
     "datawrap": "git+http://github.com/jimmyrocks/datawrap",
+    "edgegrid": "^2.0.7",
     "express": "4.12.4",
     "form-data": "1.0.0-rc4",
     "glob": "7.0.3",
