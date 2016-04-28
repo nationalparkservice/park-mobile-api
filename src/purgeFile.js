@@ -1,42 +1,40 @@
-var datawrap = require('datawrap');
+var Promise = require('bluebird');
 var EdgeGrid = require('edgegrid');
-var eg = new EdgeGrid({
-  path: './.edgerc'
-});
+var eg;
 
-function createPurgePath (filePath, unitCode) {
-  return 'https://www.nps.gov/npmap/projects/places-mobile/' + unitCode + '/' + filePath;
-}
 function updateList (fileList, unitCode, config) {
-  var length = fileList.length;
+  eg = eg || new EdgeGrid({
+    path: config.akamaiKey
+  });
 
-  while (length--) {
-    var file = fileList[length];
+  return new Promise(function (fulfill, reject) {
+    var urlList = fileList.map(function (file) {
+      return config.cacheBaseUrl + '/' + unitCode + '/' + file;
+    });
 
-    file = createPurgePath(file);
-  }
-
-  return new datawrap.Bluebird(function (fulfill, reject) {
+    // Create the Auth Object with the Payload
     eg.auth({
       body: {
         action: 'invalidate',
-        objects: fileList
+        objects: urlList
       },
       path: '/ccu/v2/queues/default',
       method: 'POST'
     });
+
+    // Send the filelist to Akamai
     eg.send(function (data, response) {
       if (response && response.body) {
         response = JSON.parse(response.body);
-
         if (response.purgeId) {
-          console.log('success');
+          console.log('successful purge!', response.purgeId);
+          fulfill(response.purgeId);
         } else {
-          console.log('error');
+          console.log('purge error', response);
+          reject(new Error(response));
         }
       }
     });
   });
 }
-
 module.exports = updateList;
