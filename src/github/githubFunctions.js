@@ -30,11 +30,11 @@ module.exports = {
         timeout: 30000,
         headers: {
           'User-Agent': config.appName,
-          'Authorization': githubSettings.auth.toLowerCase() === 'basic' ? ('Basic ' + btoa(githubSettings.username + ':' + githubSettings.password)) : null
+          'Authorization': githubSettings.auth.toLowerCase() === 'basic' ? ('Basic ' + btoa(githubSettings.username + ':' + githubSettings.password)) : undefined
         },
         qs: githubSettings.auth.toLowerCase() === 'token' ? {
           'access_token': encodeURIComponent(githubSettings.accessToken)
-        } : null
+        } : undefined
       };
     },
     body: function(sha, branch, message, fileData) {
