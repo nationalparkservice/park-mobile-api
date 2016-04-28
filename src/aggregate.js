@@ -1,4 +1,5 @@
 var datawrap = require('datawrap');
+var Promise = require('bluebird');
 var checkMountStatus = require('./checkMountStatus');
 var addStatusTools = require('./addStatuses');
 
@@ -15,11 +16,11 @@ var tools = {
 };
 
 var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailSites) {
-  return new datawrap.Bluebird(function (fulfill, reject) {
+  return new Promise(function (fulfill, reject) {
     var taskList = [{
       'name': 'StartDate',
       'task': function () {
-        return new datawrap.Bluebird(function (fulfill) {
+        return new Promise(function (fulfill) {
           fulfill(new Date());
         });
       },
@@ -61,7 +62,10 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailS
       if (!mountE && mountR) {
         datawrap.runList(taskList)
           .then(fulfill)
-          .catch(reject);
+          .catch(function (e) {
+            console.log(e);
+            reject(e);
+          });
       } else {
         reject('Error mounting drive: ' + mountE);
       }
@@ -70,7 +74,7 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailS
 };
 
 module.exports = function (schemaPath, unitCodes, config, taskName, thumbnailSites) {
-  return new datawrap.Bluebird(function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     tools.getParkList(unitCodes)
       .then(function (validParkList) {
         var taskList = validParkList.map(function (unitCode) {
