@@ -2,7 +2,6 @@ var Bluebird = require('datawrap').Bluebird;
 var mkdirp = require('mkdirp');
 var path = require('path');
 var fs = require('fs');
-var writeData = require('../github/writeData');
 Bluebird.promisifyAll(fs);
 
 var bomify = function (text) {
@@ -24,16 +23,6 @@ module.exports = function (appJson, unitCode, config) {
             fs.writeFileAsync(minFilePath, bomify(JSON.stringify(appJson)), 'utf8')
               .then(function (r2) {
                 fulfill([r, r2]);
-              /*
-              // Write it to github
-              var githubSettings = JSON.parse(JSON.stringify(config.github));
-              githubSettings.accessToken = githubSettings.accessToken.match('/secrets/') ? fs.readFileSync(githubSettings.accessToken).toString().replace(/\n/g, '') : githubSettings.accessToken;
-              var githubPath = 'places-mobile/' + unitCode + '/app.min.json';
-              writeData(bomify(JSON.stringify(appJson)), githubPath, githubSettings, config)
-                .then(function (r3) {
-                  fulfill([r, r2, r3]);
-                }).catch(reject);
-                */
               })
               .catch(reject);
           })
