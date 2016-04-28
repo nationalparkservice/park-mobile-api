@@ -8,13 +8,16 @@
   ],
   "author": "Jim McAndrew <james_mcandrew@partner.nps.gov>",
   "license": "Public Domain",
-  "contributors": [{
-    "name": "Jim McAndrew",
-    "email": "james_mcandrew@partner.nps.gov"
-  }, {
-    "name": "Nate Irwin",
-    "email": "nate_irwin@nps.gov"
-  }],
+  "contributors": [
+    {
+      "name": "Jim McAndrew",
+      "email": "james_mcandrew@partner.nps.gov"
+    },
+    {
+      "name": "Nate Irwin",
+      "email": "nate_irwin@nps.gov"
+    }
+  ],
   "scripts": {
     "start": "node app"
   },
@@ -24,6 +27,7 @@
   },
   "dependencies": {
     "adm-zip": "0.4.7",
+    "akamai": "^0.10.1",
     "bluebird": "3.3.5",
     "btoa": "1.1.2",
     "datawrap": "git+http://github.com/jimmyrocks/datawrap",
