@@ -4,38 +4,41 @@ var remove = require('./remove');
 var writeFile = require('./writeFile');
 
 var tests = {
-  write: function(params) {
+  write: function (params) {
+    console.log('params', params);
     writeFile.apply(this, params)
-      .catch(function(e) {
-        console.log('e', e);
-      })
-      .then(function(res) {
+      .then(function (res) {
         console.log(JSON.stringify(res, null, 2));
         tests.remove(params);
-      });
-  },
-  remove: function(params) {
-    remove.apply(this, params.slice(1))
-      .catch(function(e) {
-        console.log('e', e);
       })
-      .then(function(res) {
+      .catch(function (e) {
+        console.log('write error', e);
+      });
+
+  },
+  remove: function (params) {
+    remove.apply(this, params.slice(1))
+      .then(function (res) {
         console.log(JSON.stringify(res, null, 2));
+      })
+      .catch(function (e) {
+        console.log('e', e);
       });
   }
 };
 
 var baseParams = [
   './test.txt',
-  'places_mobile/klgo_legacy/media/test.txt', {
+  'places-mobile/goga/test.txt', {
     account: 'nationalparkservice',
     branch: 'gh-pages',
-    repo: 'data',
+    repo: 'projects',
     auth: config.github.auth,
-    accessToken: config.github.accessToken
+    accessToken: '<token>'
   }, {
     appName: 'Test Script'
   }
 ];
 
+console.log(baseParams);
 tests.write(baseParams);
