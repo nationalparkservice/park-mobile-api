@@ -755,7 +755,7 @@
         "path": "places_mobile_tours",
         "sql": {
           "fields": ["*", "\"sites\" AS \"tours_sites\""],
-          "orderby": "",
+          "orderby": "display_order",
           "table": "places_mobile_tours",
           "url": "https://nps.cartodb.com/api/v1/sql?&q=",
           "where": ""
