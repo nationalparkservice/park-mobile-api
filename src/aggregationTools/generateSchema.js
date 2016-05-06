@@ -1,16 +1,16 @@
 // This puts the information downloaded from CartoDB into our schema
 
-var Bluebird = require('datawrap').Bluebird;
+var Bluebird = require('bluebird');
 
 var tools = {
   format: {
-    toArray: function(value) {
+    toArray: function (value) {
       return Array.isArray(value) ? value : [value];
     },
-    number: function(value) {
+    number: function (value) {
       return isNaN(value) ? value : parseFloat(value, 10);
     },
-    value: function(value, types, transformation, schemaPart, data) {
+    value: function (value, types, transformation, schemaPart, data) {
       var returnValue, tempValue;
       if ((!value || value === '') && types.indexOf('null') > -1) {
         returnValue = null;
@@ -21,13 +21,13 @@ var tools = {
           tempValue = value.replace(/^\[|\]$/g, '').split(',');
           returnValue = [];
           if (schemaPart.source) {
-            //Map the values to the source
+            // Map the values to the source
             returnValue = tools.read.rows(schemaPart, data, {
               'field': schemaPart.key || 'id',
               'values': tempValue
             });
           } else {
-            tempValue.forEach(function(v) {
+            tempValue.forEach(function (v) {
               if (v !== null && v !== undefined) {
                 returnValue.push(tools.format.number(v));
               }
@@ -42,7 +42,7 @@ var tools = {
       return returnValue;
     }
   },
-  readValue: function(value, types, transformation, schemaPart, data) {
+  readValue: function (value, types, transformation, schemaPart, data) {
     var returnValue, tempValue;
     if ((!value || value === '') && types.indexOf('null') > -1) {
       returnValue = null;
@@ -53,13 +53,13 @@ var tools = {
         tempValue = value.replace(/^\[|\]$/g, '').split(',');
         returnValue = [];
         if (schemaPart.source) {
-          //Map the values to the source
+          // Map the values to the source
           returnValue = tools.read.rows(schemaPart, data, {
             'field': schemaPart.key || 'id',
             'values': tempValue
           });
         } else {
-          tempValue.map(function(v) {
+          tempValue.map(function (v) {
             returnValue.push(tools.format.number(v));
           });
         }
@@ -73,12 +73,12 @@ var tools = {
     return returnValue;
   },
   read: {
-    schema: function(schemaPart, data, depth) {
+    schema: function (schemaPart, data, depth) {
       depth += 1; // Mostly for debugging
-      var part,
-        type = tools.format.toArray(schemaPart.type),
-        field,
-        tmp;
+      var part;
+      var type = tools.format.toArray(schemaPart.type);
+      var field;
+      var tmp;
       if (type.indexOf('object') > -1) {
         part = {};
         for (field in schemaPart.properties) {
@@ -99,34 +99,34 @@ var tools = {
         }
       } else {
         // This condition should never occur
-        part = 'FIXME'; //tools.format.toArray(schemaPart.type)[0];
+        part = 'FIXME'; // tools.format.toArray(schemaPart.type)[0];
       }
       return part;
     },
-    rows: function(schemaPart, data, filterBy) {
-      var rows = [],
-        jsonFile = data.filter(function(d) {
-          return d.path === schemaPart.source.path && d.format === schemaPart.source.format;
-        })[0].data;
+    rows: function (schemaPart, data, filterBy) {
+      var rows = [];
+      var jsonFile = data.filter(function (d) {
+        return d.path === schemaPart.source.path && d.format === schemaPart.source.format;
+      })[0].data;
       // Filter out the values required for this step
       if (filterBy) {
-        jsonFile = jsonFile.filter(function(d) {
+        jsonFile = jsonFile.filter(function (d) {
           return filterBy.values.indexOf(d[filterBy.field].toString()) > -1;
         });
         var temp = [];
         // Set the order for the data (this is done after the filter because it needs to loop through far less items)
-        filterBy.values.forEach(function(id) {
-          jsonFile.forEach(function(d) {
+        filterBy.values.forEach(function (id) {
+          jsonFile.forEach(function (d) {
             if (d[filterBy.field].toString() === id) temp.push(d);
           });
         });
         jsonFile = temp;
       }
-      jsonFile.forEach(function(record) {
-        var row = {},
-          alias,
-          field,
-          properties = schemaPart.items ? schemaPart.items.properties : schemaPart.properties;
+      jsonFile.forEach(function (record) {
+        var row = {};
+        var alias;
+        var field;
+        var properties = schemaPart.items ? schemaPart.items.properties : schemaPart.properties;
         for (field in properties) {
           alias = properties[field].alias || field;
           row[field] = tools.format.value(record[alias], properties[field].type, properties[field].transformation, properties[field], data);
@@ -144,9 +144,9 @@ var tools = {
       });
       return rows;
     },
-    value: function(schemaPart, data, value, filterBy) {
-      var returnValue = null,
-        tryRows = tools.read.rows(schemaPart, data, filterBy);
+    value: function (schemaPart, data, value, filterBy) {
+      var returnValue = null;
+      var tryRows = tools.read.rows(schemaPart, data, filterBy);
       if (tryRows && tryRows[0] && tryRows[0][value]) {
         returnValue = tryRows[0][value];
       }
@@ -154,10 +154,10 @@ var tools = {
     }
   }
 };
-module.exports = function(options) { /*schemaJson, parkJson*/
-  var schemaJson = options.schemaJson,
-    parkJson = options.parkJson;
-  return new Bluebird(function(fulfill, reject) {
+module.exports = function (options) { /* schemaJson, parkJson */
+  var schemaJson = options.schemaJson;
+  var parkJson = options.parkJson;
+  return new Bluebird(function (fulfill, reject) {
     var returnValue = {};
     try {
       returnValue = tools.read.schema(schemaJson, parkJson, 0);
