@@ -3,13 +3,12 @@ var allowXSS = require('./src/allowXSS');
 var config = require('./config');
 var express = require('express');
 var port = config.port;
+var htmlDirectory = __dirname + '/' + config.htmlDirectory;
 
 var app = express();
-var api = new Api(config);
+var api = new Api(htmlDirectory);
 var apiRouter = express.Router();
 allowXSS(apiRouter);
-
-config.htmlDirectory = __dirname + '/' + config.htmlDirectory;
 
 api.map(function (apiCall) {
   apiRouter[apiCall.method.toLowerCase()]('/api' + apiCall.path, apiCall.process);
