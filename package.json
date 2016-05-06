@@ -32,6 +32,7 @@
     "datawrap": "git+http://github.com/jimmyrocks/datawrap",
     "edgegrid": "^2.0.7",
     "express": "4.12.4",
+    "fandlebars": "git+http://github.com/jimmyrocks/fandlebars",
     "form-data": "1.0.0-rc4",
     "glob": "7.0.3",
     "magic-resize": "git+http://github.com/jimmyrocks/magick-resize",
