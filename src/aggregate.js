@@ -1,4 +1,4 @@
-var datawrap = require('datawrap');
+var iterateTasks = require('./iterateTasks');
 var Promise = require('bluebird');
 var checkMountStatus = require('./checkMountStatus');
 var addStatusTools = require('./addStatuses');
@@ -18,7 +18,7 @@ var tools = {
 var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailSites) {
   return new Promise(function (fulfill, reject) {
     var taskList = [{
-      'name': 'StartDate',
+      'name': 'startDate',
       'task': function () {
         return new Promise(function (fulfill) {
           fulfill(new Date());
@@ -44,7 +44,7 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailS
     }, {
       'name': 'Generate Data from CartoDB',
       'task': tools.writeMetaJson,
-      'params': ['{{GenerateSchema}}', unitCode, config]
+      'params': ['{{GenerateSchema}}', unitCode, config, '{{Generate Data from CartoDB}}']
     }, {
       'name': 'Generate zip file',
       'task': tools.writeZipFile,
@@ -60,35 +60,25 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailS
 
     checkMountStatus(config, function (mountE, mountR) {
       if (!mountE && mountR) {
-        datawrap.runList(taskList)
-          .then(fulfill)
-          .catch(function (e) {
-            console.log(e);
-            reject(e);
-          });
+        return iterateTasks(taskList, 'Main Task List', config.debug);
       } else {
-        reject('Error mounting drive: ' + mountE);
+        throw new Error('Error mounting drive: ' + mountE);
       }
     });
   });
 };
 
 module.exports = function (schemaPath, unitCodes, config, taskName, thumbnailSites) {
-  return new Promise(function (resolve, reject) {
-    tools.getParkList(unitCodes)
-      .then(function (validParkList) {
-        var taskList = validParkList.map(function (unitCode) {
-          return {
-            'name': 'Aggregate ' + unitCode,
-            'task': aggregatePark,
-            'params': [schemaPath, unitCode, config, taskName, thumbnailSites]
-          };
-        });
+  return tools.getParkList(unitCodes)
+    .then(function (validParkList) {
+      var taskList = validParkList.map(function (unitCode) {
+        return {
+          'name': 'Aggregate ' + unitCode,
+          'task': aggregatePark,
+          'params': [schemaPath, unitCode, config, taskName, thumbnailSites]
+        };
+      });
 
-        datawrap.runList(taskList)
-          .then(resolve)
-          .catch(reject);
-      })
-      .catch(reject);
-  });
+      return iterateTasks(taskList, 'Aggregating parks ' + validParkList.join(','), config.debug);
+    });
 };
