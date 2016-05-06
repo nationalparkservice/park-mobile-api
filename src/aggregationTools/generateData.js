@@ -11,12 +11,12 @@ var runList = datawrap.runList;
 
 Bluebird.promisifyAll(fs);
 
-var readSchemaFile = function(schemaFile) {
-  return new Bluebird(function(fulfill, reject) {
+var readSchemaFile = function (schemaFile) {
+  return new Bluebird(function (fulfill, reject) {
     // Read the Schema File
     if (schemaFile) {
       fs.readFileAsync(schemaFile, 'utf8')
-        .then(function(schemaData) {
+        .then(function (schemaData) {
           var schema;
           try {
             schema = JSON.parse(schemaData);
@@ -34,30 +34,30 @@ var readSchemaFile = function(schemaFile) {
 
 var readTypes = {
   'http': {
-    'cartodb': function(schemaPart, unitCode, config) {
-      return new Bluebird(function(fulfill, reject) {
-        var buildSql = function() {
-          var sqlParts = schemaPart.source.sql,
-            sqlString = 'SELECT {{fields}} FROM {{table}} WHERE {{where}}{{extras}}',
-            getFields = function(props, fields) {
-              // Get the fields from the properties
-              var newFields = [];
-              for (var property in props) {
-                if (!props[property].transformation || props[property].transformation === 'StringToArray') {
-                  if (!props[property].noColumn) {
-                    newFields.push('"' + (props[property].alias || property) + '"');
-                  }
+    'cartodb': function (schemaPart, unitCode, config) {
+      return new Bluebird(function (fulfill, reject) {
+        var buildSql = function () {
+          var sqlParts = schemaPart.source.sql;
+          var sqlString = 'SELECT {{fields}} FROM {{table}} WHERE {{where}}{{extras}}';
+          var getFields = function (props, fields) {
+            // Get the fields from the properties
+            var newFields = [];
+            for (var property in props) {
+              if (!props[property].transformation || props[property].transformation === 'StringToArray') {
+                if (!props[property].noColumn) {
+                  newFields.push('"' + (props[property].alias || property) + '"');
                 }
               }
+            }
 
-              // Replace the '*' with the new fields
-              if (fields.indexOf('*') >= 0 && newFields.length) {
-                newFields = fields.slice(0, fields.indexOf('*')).concat(newFields).concat(fields.slice(fields.indexOf('*') + 1));
-              } else {
-                newFields = fields;
-              }
-              return newFields;
-            };
+            // Replace the '*' with the new fields
+            if (fields.indexOf('*') >= 0 && newFields.length) {
+              newFields = fields.slice(0, fields.indexOf('*')).concat(newFields).concat(fields.slice(fields.indexOf('*') + 1));
+            } else {
+              newFields = fields;
+            }
+            return newFields;
+          };
 
           // Fields
           sqlParts.properties = schemaPart.items ? schemaPart.items.properties : schemaPart.properties;
@@ -73,7 +73,7 @@ var readTypes = {
           // Assign Table
           sqlParts.text.table = '"' + sqlParts.table + '"';
           // Assign Where Clause
-          sqlParts.text.where = (sqlParts.where ? '(' + sqlParts.where + ') AND ' : '') + '"unit_code"=\'' + unitCode + '\'';
+          sqlParts.text.where = (sqlParts.where ? '(' + sqlParts.where + ') AND ' : '') + '"unit_code"=\'' + unitCode + "'";
           // Assign Order By
           sqlParts.text.extras = sqlParts.orderby ? ' ORDER BY ' + sqlParts.orderby : '';
 
@@ -85,7 +85,7 @@ var readTypes = {
           reject('No fields');
         } else {
           datawrap(config.database.cartodb, config.database.defaults).runQuery(sqlStatement)
-            .then(function(result) {
+            .then(function (result) {
               if (result[0] && result[0].rows) {
                 fulfill(result[0].rows);
               } else {
@@ -99,13 +99,13 @@ var readTypes = {
   }
 };
 
-var readSource = function(schemaPart, unitCode, config) {
+var readSource = function (schemaPart, unitCode, config) {
   var sourceInfo = schemaPart.source;
 
-  return new Bluebird(function(fulfill, reject) {
+  return new Bluebird(function (fulfill, reject) {
     if (readTypes[sourceInfo.type] && readTypes[sourceInfo.type][sourceInfo.format]) {
       readTypes[sourceInfo.type][sourceInfo.format](schemaPart, unitCode, config)
-        .then(function(data) {
+        .then(function (data) {
           fulfill({
             'data': data,
             'format': sourceInfo.format,
@@ -121,11 +121,11 @@ var readSource = function(schemaPart, unitCode, config) {
   });
 };
 
-var readData = function(schema, unitCode, config) {
+var readData = function (schema, unitCode, config) {
   var taskList = [];
-  var getData = function(schemaPart) {
+  var getData = function (schemaPart) {
     var field;
-    if (schemaPart.source && typeof(schemaPart.source) === 'object' && !Array.isArray(schemaPart.source)) {
+    if (schemaPart.source && typeof (schemaPart.source) === 'object' && !Array.isArray(schemaPart.source)) {
       // This schemaPart has a source
       taskList.push({
         'name': 'Getting a schemaPart',
@@ -133,7 +133,7 @@ var readData = function(schema, unitCode, config) {
         'params': [schemaPart, unitCode, config]
       });
     }
-    if (schemaPart.properties && typeof(schemaPart.properties) === 'object' && !Array.isArray(schemaPart.properties)) {
+    if (schemaPart.properties && typeof (schemaPart.properties) === 'object' && !Array.isArray(schemaPart.properties)) {
       // Properties list, start a recursive function
       for (field in schemaPart.properties) {
         getData(schemaPart.properties[field]);
@@ -144,7 +144,7 @@ var readData = function(schema, unitCode, config) {
     }
   };
 
-  return new Bluebird(function(fulfill, reject) {
+  return new Bluebird(function (fulfill, reject) {
     // Build the taskList
     getData(schema);
 
@@ -154,13 +154,13 @@ var readData = function(schema, unitCode, config) {
   });
 };
 
-module.exports = function(schemaPath, unitCode, config) {
-  return new Bluebird(function(fulfill, reject) {
+module.exports = function (schemaPath, unitCode, config) {
+  return new Bluebird(function (fulfill, reject) {
     // Read the Schema File
     readSchemaFile(schemaPath)
-      .then(function(schema) {
+      .then(function (schema) {
         readData(schema, unitCode, config)
-          .then(function(parkData) {
+          .then(function (parkData) {
             fulfill({
               schemaJson: schema,
               parkJson: parkData
