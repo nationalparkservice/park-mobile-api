@@ -1,29 +1,31 @@
-var datawrap = require('datawrap');
+var Promise = require('bluebird');
+var fandlebars = require('fandlebars');
 var fs = require('fs');
 var glob = require('glob');
+var iterateTasks = require('./iterateTasks');
 
-datawrap.Bluebird.promisifyAll(fs);
+Promise.promisifyAll(fs);
 
-module.exports = function(options) {
-  var mediaDirectory = datawrap.fandlebars(options.mediaDirectory, options),
-    uuid = options.uuid;
+module.exports = function (options) {
+  var mediaDirectory = fandlebars(options.mediaDirectory, options);
+  var uuid = options.uuid;
 
-  return new datawrap.Bluebird(function(fulfill, reject) {
+  return new Promise(function (fulfill, reject) {
     glob(uuid + '_*.*', {
       'cwd': mediaDirectory
-    }, function(err, files) {
+    }, function (err, files) {
       if (err) {
         reject(err);
       } else if (files.length === 0) {
         reject('Image (' + uuid + ') does not exist');
       } else {
-        var taskList = files.map(function(file) {
+        var taskList = files.map(function (file) {
           return {
             'name': 'Remove file ' + file,
-            'task': function(f) {
-              return new datawrap.Bluebird(function(f2, r2) {
+            'task': function (f) {
+              return new Promise(function (f2, r2) {
                 fs.unlinkAsync(f)
-                  .then(function() {
+                  .then(function () {
                     f2({
                       file: f
                     });
@@ -34,7 +36,7 @@ module.exports = function(options) {
             'params': [mediaDirectory + file]
           };
         });
-        datawrap.runList(taskList)
+        return iterateTasks(taskList, 'Delete images list')
           .then(fulfill)
           .catch(reject);
       }
