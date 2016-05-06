@@ -1,8 +1,8 @@
-var Bluebird = require('datawrap').Bluebird;
+var Promise = require('bluebird');
 var mkdirp = require('mkdirp');
 var path = require('path');
 var fs = require('fs');
-Bluebird.promisifyAll(fs);
+Promise.promisifyAll(fs);
 
 var bomify = function (text) {
   // Add the utf8 Byte Order Mark
@@ -11,22 +11,25 @@ var bomify = function (text) {
 };
 
 module.exports = function (appJson, unitCode, config) {
-  return new Bluebird(function (fulfill, reject) {
+  return new Promise(function (fulfill, reject) {
     var filePath = config.fileLocation + '/' + unitCode + '/app.json';
     var minFilePath = filePath.replace(/\.json$/, '.min.json');
     mkdirp(path.dirname(filePath), function (err) {
       if (err) {
         reject(err);
       } else {
-        fs.writeFileAsync(filePath, bomify(JSON.stringify(appJson, null, 2)), 'utf8')
-          .then(function (r) {
-            fs.writeFileAsync(minFilePath, bomify(JSON.stringify(appJson)), 'utf8')
-              .then(function (r2) {
+        var newFile = bomify(JSON.stringify(appJson, null, 2));
+        fs.readFileAsync(filePath, 'utf8').then(function (oldFile) {
+          if (oldFile !== newFile) {
+            fs.writeFileAsync(filePath, newFile, 'utf8').then(function (r) {
+              fs.writeFileAsync(minFilePath, bomify(JSON.stringify(appJson)), 'utf8').then(function (r2) {
                 fulfill([r, r2]);
-              })
-              .catch(reject);
-          })
-          .catch(reject);
+              }).catch(reject);
+            }).catch(reject);
+          } else {
+            fulfill([]);
+          }
+        }).catch(reject);
       }
     });
   });
