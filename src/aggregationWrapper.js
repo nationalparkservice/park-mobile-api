@@ -1,48 +1,68 @@
-var aggregate = require('./aggregate'),
-  config = require('../config'),
-  createUuid = require('./createUuid'),
-resWrapper = require('./resWrapper');
+var config = require('../config');
+var createUuid = require('./createUuid');
+var aggregate = require('./aggregate');
+var resWrapper = require('./resWrapper');
 
-
-var success = function(taskName, res) {
-  return res.send({
+var success = function (taskName, result) {
+  return result.send({
     'taskName': taskName
   });
 };
 
-var reportError = function(error, res) {
-  return res.error({
+var createThumbnailList = function (siteId) {
+  // Thumbnails
+  var thumbnailList = [];
+
+  if (siteId && (siteId.toLowerCase() === 'true' || siteId.toLowerCase() === 'all')) {
+    return true;
+  } else if (siteId) {
+    siteId.split(',').forEach(function (thumbnail) {
+      if (!isNaN(thumbnail)) {
+        thumbnailList.push(parseInt(thumbnail, 10));
+      }
+    });
+    return thumbnailList;
+  } else {
+    return false;
+  }
+};
+
+var reportError = function (error, result) {
+  return result.error({
     'Error': error
   });
 };
 
-module.exports = function(req, origRes) {
-  var res = resWrapper(req, origRes);
+module.exports = function (request, originalResult) {
+  // Wrap the result
+  var newResult = resWrapper(request, originalResult);
+
+  // Create a new task
   var taskName = createUuid();
-  if (!(req.query && req.query.sync)) {
-    success(taskName, res);
-  }
-  var thumbnails = false; // true means all thumbnails, or you can pass in a single site id for a single site, or an array of site numbers
-  if (req.params.siteId) {
-    // We do a lot of parsing on this
-    if (req.params.siteId.toLowerCase() === 'true' || req.params.siteId.toLowerCase() === 'all') {
-      thumbnails = true;
-    } else {
-      thumbnails = [];
-      req.params.siteId.split(',').forEach(function(tn) {
-        if (!isNaN(tn)) {
-          thumbnails.push(parseInt(tn, 10));
-        }
-      });
-    }
+
+  // Parse out the unit code from either the body or the params
+  var unitCode = (request.body && request.body.unitCode) || (request.params && request.params.unitCode);
+
+  //config is sent directly from the config file
+  
+  // determine if we will be generating json (includes 'generate/json')
+  var generateJson = !!request.originalUrl.match(/generate\/json/g);
+
+  var thumbnails = createThumbnailList(request.params.siteId);
+
+
+  // If the request doesn't have sync specified in its query, then we assume async, and return something to the browser right away
+  if (!(request.query && request.query.sync)) {
+    success(taskName, newResult);
   }
 
-  aggregate('app.schema.json', (req.body && req.body.unitCode) || (req.params && req.params.unitCode), config, taskName, thumbnails)
-    .then(function() {
-      success(taskName, res);
+
+
+  aggregate('app.schema.json', unitCode, config, taskName, generateJson, thumbnails)
+    .then(function () {
+      success(taskName, newResult);
     })
-    .catch(function(error) {
-      reportError(error, res);
-      throw (error);
+    .catch(function (error) {
+      reportError(error, newResult);
     });
 };
