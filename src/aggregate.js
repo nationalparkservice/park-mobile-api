@@ -15,7 +15,7 @@ var tools = {
   purgeCache: require('./aggregationTools/purgeCache') // = function(startDate, unitCode, config)
 };
 
-var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailSites) {
+var aggregatePark = function (schemaPath, unitCode, config, taskName, generateJson, thumbnailSites) {
   return new Promise(function (fulfill, reject) {
     var taskList = [{
       'name': 'startDate',
@@ -37,7 +37,9 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailS
       'name': 'Write the thumbnails',
       'task': tools.writeThumbnails,
       'params': ['{{GenerateSchema}}', unitCode, config, thumbnailSites]
-    }, {
+    }];
+
+    var appJsonTasks = [{
       'name': 'Generate Data from CartoDB',
       'task': tools.writeAppJson,
       'params': ['{{GenerateSchema}}', unitCode, config]
@@ -55,7 +57,12 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, thumbnailS
       'params': ['{{startDate}}', unitCode, config]
     }];
 
-    // Add tools that will keep track of the status for status reporting
+    // Only regenerate the json if it was requested
+    if (generateJson) {
+      appJsonTasks.forEach(function (task) {
+        taskList.push(task);
+      });
+    }
     taskList = addStatusTools(taskList, taskName);
 
     checkMountStatus(config, function (mountE, mountR) {
