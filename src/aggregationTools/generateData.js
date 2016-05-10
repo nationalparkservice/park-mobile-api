@@ -2,6 +2,7 @@
 
 // Requires
 var Promise = require('bluebird');
+var datawrap = require('datawrap');
 var fandlebars = require('fandlebars');
 var fs = require('fs');
 var iterateTasks = require('../iterateTasks');
