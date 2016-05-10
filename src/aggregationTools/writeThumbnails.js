@@ -91,18 +91,19 @@ var getRequests = function (thumbnailList, unitCode, config) {
 
 // Gets the information about the thumbnail
 var getThumbnailData = function (media, sites, requestedSites) {
+  // Quick and dirty want to get around issues where the parent is undefined
   var checkField = function (parents, field) {
     return parents && parents[field] ? parents[field] : null;
   };
 
   // Filter out the media array so we only have thumbnails
-  var thumbnails = media.filter(function (a) {
-    return a.type === 'map_thumbnail';
+  var thumbnails = media.filter(function (mediaObject) {
+    return mediaObject.type === 'map_thumbnail';
   });
 
   var findMatch = function (sites, thumbnailId) {
     for (var i = 0; i < sites.length; i++) {
-      // Check if there is a thumnail associated with this site
+      // Check if there is a thumbnail associated with this site
       if (checkField(sites[i], 'map_thumbnail_image') === thumbnailId) {
         // Check it we're requesting this thumbnail
         if (requestedSites === true || requestedSites.indexOf(checkField(sites[i], 'id')) >= 0) {
@@ -119,6 +120,8 @@ var getThumbnailData = function (media, sites, requestedSites) {
     if (match) {
       thumbnail.latitude = sites[match].latitude;
       thumbnail.longitude = sites[match].longitude;
+    } else {
+      console.log('No Match Found for ', thumbnail.id, 'in', sites);
     }
     return match ? thumbnail : null;
   });
@@ -188,14 +191,19 @@ var moveFiles = function (fileList, config) {
 module.exports = function (appJson, unitCode, config, requestedSites) {
   var media;
   var sites;
+
+  // Start the promise
   return new Promise(function (fulfill, reject) {
+    // If no sites were requested just fulfill immediately
     if (!requestedSites) {
       fulfill();
     } else {
+      // Otherwise we determine if it's all sites (true) or an array of sites, or just a single site (which we then put into an array)
       requestedSites = requestedSites === true || Array.isArray(requestedSites) ? requestedSites : [requestedSites];
-      // Loop through every site, get its lat / lon
-      // generate a thumbnail from mapbox and upload it to github
-      // Copy the objects
+      // We will then loop through every site, get its lat / lon
+      // generate a thumbnail from mapbox and save it
+
+      // Copy the objects out of the appJson
       try {
         media = JSON.parse(JSON.stringify(appJson.media));
         sites = JSON.parse(JSON.stringify(appJson.sites));
@@ -206,6 +214,7 @@ module.exports = function (appJson, unitCode, config, requestedSites) {
 
       // Match the thumbnails to the sites
       var matchedThumbnails = getThumbnailData(media, sites, requestedSites);
+
       // Create a list of URLs to request for processing
       var imgRequests = getRequests(matchedThumbnails, unitCode, config);
 
