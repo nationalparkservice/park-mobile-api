@@ -1,24 +1,26 @@
-var datawrap = require('datawrap'),
-  fs = require('fs'),
-  geoTools = require('../geoTools.js'),
-  magickResizeWrapper = require('../magickResizeWrapper'),
-  magickTypes = require('../../node_modules/magick-resize/types'),
-  mkdirp = require('mkdirp'),
-  path = require('path'),
-  thumbnailSettings = require('../../thumbnailSettings');
+var Promise = require('bluebird');
+var iterateTasks = require('../iterateTasks');
+var fandlebars = require('fandlebars');
+var fs = require('fs');
+var geoTools = require('../geoTools.js');
+var magickResizeWrapper = require('../magickResizeWrapper');
+var magickTypes = require('../../node_modules/magick-resize/types');
+var mkdirp = require('mkdirp');
+var path = require('path');
+var thumbnailSettings = require('../../thumbnailSettings');
 
-datawrap.Bluebird.promisifyAll(fs);
+Promise.promisifyAll(fs);
 
-var moveAsync = function(source, dest) {
-  return new datawrap.Bluebird(function(fulfill, reject) {
+var moveAsync = function (source, dest) {
+  return new Promise(function (fulfill, reject) {
     var inputStream = fs.createReadStream(source);
     var outputStream = fs.createWriteStream(dest);
 
     inputStream.pipe(outputStream);
-    outputStream.on('error', function(e) {
+    outputStream.on('error', function (e) {
       reject(e);
     });
-    inputStream.on('end', function() {
+    inputStream.on('end', function () {
       fs.unlinkSync(source);
       fulfill();
     });
@@ -26,7 +28,7 @@ var moveAsync = function(source, dest) {
 };
 
 // Offsets the marker from its lat/lon by and offset in pixels
-var addOffset = function(obj) {
+var addOffset = function (obj) {
   obj.longitudeMarker = obj.zoom && obj.markerOffsetX ? geoTools.addPixelsToLong(obj.markerOffsetX, obj.longitude, obj.zoom).toString() : obj.longitude;
   obj.latitudeMarker = obj.zoom && obj.markerOffsetY ? geoTools.addPixelsToLat(obj.markerOffsetY, obj.latitude, obj.zoom).toString() : obj.latitude;
   obj.longitudeImage = obj.zoom && obj.offsetX ? geoTools.addPixelsToLong(obj.offsetX, obj.longitude, obj.zoom).toString() : obj.longitude;
@@ -35,9 +37,9 @@ var addOffset = function(obj) {
 };
 
 // Merges two objects togetger
-var objMerge = function(objs) {
-  var newObj = {},
-    attrname;
+var objMerge = function (objs) {
+  var newObj = {};
+  var attrname;
   for (var i = 0; i < objs.length; i++) {
     for (attrname in objs[i]) {
       if (objs[i][attrname]) newObj[attrname] = objs[i][attrname].toString();
@@ -48,7 +50,7 @@ var objMerge = function(objs) {
 };
 
 // Returns the right format for values (used to parse filenames)
-var formatValue = function(value) {
+var formatValue = function (value) {
   var returnValue = null;
   if (value !== false && value) {
     if (isNaN(value)) {
@@ -63,12 +65,12 @@ var formatValue = function(value) {
 };
 
 // Makes a list of requests from mapbox and downloads them
-var getRequests = function(thumbnailList, unitCode, config) {
+var getRequests = function (thumbnailList, unitCode, config) {
   var requestList = [];
   var settings = thumbnailSettings[unitCode] || thumbnailSettings['default'];
   config.mapbox.token = config.mapbox.token.match('/secrets/') ? fs.readFileSync(config.mapbox.token).toString().replace(/\n/g, '') : config.mapbox.token;
-  thumbnailList.map(function(img) {
-    settings.map(function(setting) {
+  thumbnailList.map(function (img) {
+    settings.map(function (setting) {
       var imgRequest = {
         type: setting.type,
         output: (formatValue(img[setting.field]) ? Math.random().toString(27).substr(2, 10) + '_' + formatValue(img[setting.field]) : null)
@@ -77,7 +79,7 @@ var getRequests = function(thumbnailList, unitCode, config) {
         // We are making an image for this setting!
         imgRequest._filename = img[setting.field];
         imgRequest._unitCode = unitCode;
-        imgRequest.url = datawrap.fandlebars(setting.url, addOffset(objMerge([setting, magickTypes[setting.type], img, {
+        imgRequest.url = fandlebars(setting.url, addOffset(objMerge([setting, magickTypes[setting.type], img, {
           'token': config.mapbox.token
         }])));
         requestList.push(imgRequest);
@@ -88,17 +90,17 @@ var getRequests = function(thumbnailList, unitCode, config) {
 };
 
 // Gets the information about the thumbnail
-var getThumbnailData = function(media, sites, requestedSites) {
-  var checkField = function(parents, field) {
+var getThumbnailData = function (media, sites, requestedSites) {
+  var checkField = function (parents, field) {
     return parents && parents[field] ? parents[field] : null;
   };
 
   // Filter out the media array so we only have thumbnails
-  var thumbnails = media.filter(function(a) {
+  var thumbnails = media.filter(function (a) {
     return a.type === 'map_thumbnail';
   });
 
-  var findMatch = function(sites, thumbnailId) {
+  var findMatch = function (sites, thumbnailId) {
     for (var i = 0; i < sites.length; i++) {
       // Check if there is a thumnail associated with this site
       if (checkField(sites[i], 'map_thumbnail_image') === thumbnailId) {
@@ -112,7 +114,7 @@ var getThumbnailData = function(media, sites, requestedSites) {
   };
 
   // Add the lat and lon to the thumbnail
-  thumbnails = thumbnails.map(function(thumbnail) {
+  thumbnails = thumbnails.map(function (thumbnail) {
     var match = findMatch(sites, thumbnail.id);
     if (match) {
       thumbnail.latitude = sites[match].latitude;
@@ -122,20 +124,20 @@ var getThumbnailData = function(media, sites, requestedSites) {
   });
 
   // Remove the unmatched thumbnails
-  thumbnails = thumbnails.filter(function(a) {
+  thumbnails = thumbnails.filter(function (a) {
     return !!a;
   });
   return thumbnails;
 };
 
 // We delete files if there's an error so we don't have a bunch of files lying around
-var deleteFiles = function(fileList) {
+var deleteFiles = function (fileList) {
   // Function that deletes a single file
-  var deleteFile = function(filename) {
-    return new datawrap.Bluebird(function(fulfill, reject) {
+  var deleteFile = function (filename) {
+    return new Promise(function (fulfill, reject) {
       fs.unlinkAsync(filename)
         .then(fulfill)
-        .catch(function(e) {
+        .catch(function (e) {
           // ENOENT means it was already deleted
           if (e.code === 'ENOENT') {
             fulfill();
@@ -146,26 +148,21 @@ var deleteFiles = function(fileList) {
     });
   };
 
-
-  return new datawrap.Bluebird(function(fulfill, reject) {
-    var deleteTasks = fileList.map(function(d) {
-      return {
-        'name': 'Deleting the temp file for: ' + d.output,
-        'task': deleteFile,
-        'params': [d.output]
-      };
-    });
-    datawrap.runList(deleteTasks)
-      .then(fulfill)
-      .catch(reject);
+  var deleteTasks = fileList.map(function (d) {
+    return {
+      'name': 'Deleting the temp file for: ' + d.output,
+      'task': deleteFile,
+      'params': [d.output]
+    };
   });
+  return iterateTasks(deleteTasks);
 };
 
 // Writes files to the directory / server
-var moveFiles = function(fileList, config) {
-  var moveFile = function(oldName, newName) {
-    return new datawrap.Bluebird(function(fulfill, reject) {
-      mkdirp(path.dirname(newName), function(error) {
+var moveFiles = function (fileList, config) {
+  var moveFile = function (oldName, newName) {
+    return new Promise(function (fulfill, reject) {
+      mkdirp(path.dirname(newName), function (error) {
         if (!error) {
           moveAsync(oldName, newName)
             .then(fulfill)
@@ -176,25 +173,22 @@ var moveFiles = function(fileList, config) {
       });
     });
   };
-  return new datawrap.Bluebird(function(fulfill, reject) {
-    var filePath = config.fileLocation + '/{{_unitCode}}/media/{{_filename}}',
-      taskList = fileList.map(function(file) {
-        return {
-          'name': 'Moving ' + file._filename,
-          'task': moveFile,
-          'params': [file.output, datawrap.fandlebars(filePath, file)]
-        };
-      });
-
-    datawrap.runList(taskList)
-      .then(fulfill)
-      .catch(reject);
+  var filePath = config.fileLocation + '/{{_unitCode}}/media/{{_filename}}';
+  var taskList = fileList.map(function (file) {
+    return {
+      'name': 'Moving ' + file._filename,
+      'task': moveFile,
+      'params': [file.output, fandlebars(filePath, file)]
+    };
   });
+
+  return iterateTasks(taskList);
 };
 
-module.exports = function(appJson, unitCode, config, requestedSites) {
-  var media, sites;
-  return new datawrap.Bluebird(function(fulfill, reject) {
+module.exports = function (appJson, unitCode, config, requestedSites) {
+  var media;
+  var sites;
+  return new Promise(function (fulfill, reject) {
     if (!requestedSites) {
       fulfill();
     } else {
@@ -217,7 +211,7 @@ module.exports = function(appJson, unitCode, config, requestedSites) {
 
       // Create a task list to go and download and generate all of the thumbnails
       var taskList = [];
-      imgRequests.map(function(imgRequest) {
+      imgRequests.map(function (imgRequest) {
         taskList.push({
           'name': 'Download and resize thumbmail ' + imgRequest._filename,
           'task': magickResizeWrapper,
@@ -226,19 +220,19 @@ module.exports = function(appJson, unitCode, config, requestedSites) {
       });
 
       // Run the task list and then either upload the files or send back an error
-      datawrap.runList(taskList).then(function() {
+      iterateTasks(taskList).then(function () {
         // Success, so upload the files to github!
         moveFiles(imgRequests, config)
-          .then(function() {
+          .then(function () {
             // Delete any files that we made
-            deleteFiles(imgRequests).then(function() {
+            deleteFiles(imgRequests).then(function () {
               // Return that there was success
               fulfill(imgRequests);
             }).catch(reject);
           }).catch(reject);
-      }).catch(function(err) {
+      }).catch(function (err) {
         // Error, so delete any files that we made
-        deleteFiles(imgRequests).then(function() {
+        deleteFiles(imgRequests).then(function () {
           // Return the original error
           reject(err);
         }).catch(reject);
