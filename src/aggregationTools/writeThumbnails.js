@@ -93,7 +93,7 @@ var getRequests = function (thumbnailList, unitCode, config) {
 var getThumbnailData = function (media, sites, requestedSites) {
   // Quick and dirty want to get around issues where the parent is undefined
   var checkField = function (parents, field) {
-    return parents && parents[field] ? parents[field] : null;
+    return parents && parents[field] ? parents[field] : '';
   };
 
   // Filter out the media array so we only have thumbnails
@@ -106,7 +106,7 @@ var getThumbnailData = function (media, sites, requestedSites) {
       // Check if there is a thumbnail associated with this site
       if (checkField(sites[i], 'map_thumbnail_image') === thumbnailId) {
         // Check it we're requesting this thumbnail
-        if (requestedSites === true || requestedSites.indexOf(checkField(sites[i], 'id')) >= 0) {
+        if (requestedSites === true || requestedSites.indexOf(checkField(sites[i], 'id').toString()) >= 0) {
           return i;
         }
       }
@@ -120,8 +120,6 @@ var getThumbnailData = function (media, sites, requestedSites) {
     if (match) {
       thumbnail.latitude = sites[match].latitude;
       thumbnail.longitude = sites[match].longitude;
-    } else {
-      console.log('No Match Found for ', thumbnail.id, 'in', sites);
     }
     return match ? thumbnail : null;
   });
