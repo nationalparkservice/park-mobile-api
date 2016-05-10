@@ -1,18 +1,15 @@
 // This reads the schema file and downloads the associated information from CartoDB
 
 // Requires
-var datawrap = require('datawrap');
+var Promise = require('bluebird');
+var fandlebars = require('fandlebars');
 var fs = require('fs');
+var iterateTasks = require('../iterateTasks');
 
-// Tools
-var Bluebird = datawrap.Bluebird;
-var fandlebars = datawrap.fandlebars;
-var runList = datawrap.runList;
-
-Bluebird.promisifyAll(fs);
+Promise.promisifyAll(fs);
 
 var readSchemaFile = function (schemaFile) {
-  return new Bluebird(function (fulfill, reject) {
+  return new Promise(function (fulfill, reject) {
     // Read the Schema File
     if (schemaFile) {
       fs.readFileAsync(schemaFile, 'utf8')
@@ -35,7 +32,7 @@ var readSchemaFile = function (schemaFile) {
 var readTypes = {
   'http': {
     'cartodb': function (schemaPart, unitCode, config) {
-      return new Bluebird(function (fulfill, reject) {
+      return new Promise(function (fulfill, reject) {
         var buildSql = function () {
           var sqlParts = schemaPart.source.sql;
           var sqlString = 'SELECT {{fields}} FROM {{table}} WHERE {{where}}{{extras}}';
@@ -102,7 +99,7 @@ var readTypes = {
 var readSource = function (schemaPart, unitCode, config) {
   var sourceInfo = schemaPart.source;
 
-  return new Bluebird(function (fulfill, reject) {
+  return new Promise(function (fulfill, reject) {
     if (readTypes[sourceInfo.type] && readTypes[sourceInfo.type][sourceInfo.format]) {
       readTypes[sourceInfo.type][sourceInfo.format](schemaPart, unitCode, config)
         .then(function (data) {
@@ -144,18 +141,14 @@ var readData = function (schema, unitCode, config) {
     }
   };
 
-  return new Bluebird(function (fulfill, reject) {
     // Build the taskList
     getData(schema);
 
-    runList(taskList)
-      .then(fulfill)
-      .catch(reject);
-  });
+    return iterateTasks(taskList)
 };
 
 module.exports = function (schemaPath, unitCode, config) {
-  return new Bluebird(function (fulfill, reject) {
+  return new Promise(function (fulfill, reject) {
     // Read the Schema File
     readSchemaFile(schemaPath)
       .then(function (schema) {
