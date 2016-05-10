@@ -1,12 +1,12 @@
-var Bluebird = require('datawrap').Bluebird;
-var mkdirp = require('mkdirp');
 var AdmZip = require('adm-zip');
+var Promise = require('bluebird');
+var mkdirp = require('mkdirp');
 var path = require('path');
 
-var cleanArray = function(array) {
-  //removes nulls and duplicates
+var cleanArray = function (array) {
+  // removes nulls and duplicates
   var newArray = [];
-  array.forEach(function(item) {
+  array.forEach(function (item) {
     if ((item || item === 0) && (newArray.indexOf(item) === -1)) {
       newArray.push(item);
     }
@@ -14,16 +14,16 @@ var cleanArray = function(array) {
   return newArray;
 };
 
-var getMediaList = function(template, appJson) {
+var getMediaList = function (template, appJson) {
   var ref = template.reference.split('.');
   var ids = [];
   var returnValue;
 
-  var readTree = function(trunk, branches) {
+  var readTree = function (trunk, branches) {
     if (branches.length === 1) {
       if (trunk[branches[0]]) {
         if (Array.isArray(trunk[branches[0]])) {
-          trunk[branches[0]].forEach(function(d) {
+          trunk[branches[0]].forEach(function (d) {
             ids.push(d);
           });
         } else {
@@ -42,7 +42,7 @@ var getMediaList = function(template, appJson) {
   if (template.type === 'icon') {
     returnValue = ids;
   } else {
-    returnValue = appJson.media.filter(function(d) {
+    returnValue = appJson.media.filter(function (d) {
       return (d.type && d.type === template.type && ids.indexOf(d.id) >= 0);
     });
   }
@@ -50,33 +50,31 @@ var getMediaList = function(template, appJson) {
   return returnValue;
 };
 
-
-var getFiles = function(mediaTemplate, field, appJson, config, unitCode) {
+var getFiles = function (mediaTemplate, field, appJson, config, unitCode) {
   var fileList = [];
   var media;
   var prefix = config.fileLocation + '/' + (mediaTemplate.type === 'icon' ? 'icons/' : unitCode + '/media/');
   if (mediaTemplate.reference) {
-    //MAGIC
+    // MAGIC
     media = getMediaList(mediaTemplate, appJson);
   } else {
-    media = appJson.media.filter(function(d) {
+    media = appJson.media.filter(function (d) {
       return d.type === mediaTemplate.type;
     });
   }
 
-  fileList = media.map(function(medium) {
+  fileList = media.map(function (medium) {
     return medium[field] ? prefix + medium[field] : null;
   });
 
   return cleanArray(fileList);
 };
 
-module.exports = function(appJson, unitCode, config, sizes) {
-
-  return new Bluebird(function(fulfill, reject) {
+module.exports = function (appJson, unitCode, config, sizes) {
+  return new Promise(function (fulfill, reject) {
     var archiveDirectory = config.fileLocation + '/' + unitCode + '/archives/';
     var allFiles = {};
-    sizes = sizes || function() {
+    sizes = sizes || function () {
       var returnValue = [];
       for (var size in config.zipFields) {
         returnValue.push(size);
@@ -85,10 +83,10 @@ module.exports = function(appJson, unitCode, config, sizes) {
     }();
     mkdirp.sync(archiveDirectory);
 
-    sizes.forEach(function(size) {
+    sizes.forEach(function (size) {
       var zip = new AdmZip();
-      var fileList = [],
-        errorList = [];
+      var fileList = [];
+      var errorList = [];
       try {
         for (var mediaType in config.zipTemplate) {
           if (config.zipTemplate[mediaType] && config.zipFields[size]) {
@@ -97,7 +95,7 @@ module.exports = function(appJson, unitCode, config, sizes) {
             fileList = cleanArray(fileList.concat(getFilesRes));
           }
         }
-        fileList.forEach(function(file) {
+        fileList.forEach(function (file) {
           var filePath = file.replace(config.fileLocation + '/', '');
           if (filePath.substr(0, 5) !== 'icons') {
             filePath = filePath.replace(/^.+?\//g, '');
