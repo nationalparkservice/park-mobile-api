@@ -1,6 +1,6 @@
 // This puts the information downloaded from CartoDB into our schema
 
-var Bluebird = require('bluebird');
+var Promise = require('bluebird');
 
 var tools = {
   format: {
@@ -157,7 +157,7 @@ var tools = {
 module.exports = function (options) { /* schemaJson, parkJson */
   var schemaJson = options.schemaJson;
   var parkJson = options.parkJson;
-  return new Bluebird(function (fulfill, reject) {
+  return new Promise(function (fulfill, reject) {
     var returnValue = {};
     try {
       returnValue = tools.read.schema(schemaJson, parkJson, 0);
