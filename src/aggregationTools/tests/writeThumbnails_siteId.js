@@ -4,7 +4,7 @@ var writeThumbnails = require('../writeThumbnails');
 var config = require('../../../config');
 var schemaFile = './app.schema.json';
 var unitCode = 'goga';
-var siteId = '772';
+var siteId = '788';
 
 console.log('Generating Data');
 generateData(schemaFile, unitCode, config)
