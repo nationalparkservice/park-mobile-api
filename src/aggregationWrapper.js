@@ -43,20 +43,17 @@ module.exports = function (request, originalResult) {
   // Parse out the unit code from either the body or the params
   var unitCode = (request.body && request.body.unitCode) || (request.params && request.params.unitCode);
 
-  //config is sent directly from the config file
-  
+  // config is sent directly from the config file
+
   // determine if we will be generating json (includes 'generate/json')
   var generateJson = !!request.originalUrl.match(/generate\/json/g);
 
   var thumbnails = createThumbnailList(request.params.siteId);
 
-
   // If the request doesn't have sync specified in its query, then we assume async, and return something to the browser right away
   if (!(request.query && request.query.sync)) {
     success(taskName, newResult);
   }
-
-
 
   aggregate('app.schema.json', unitCode, config, taskName, generateJson, thumbnails)
     .then(function () {
