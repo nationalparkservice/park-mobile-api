@@ -75,14 +75,14 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, generateJs
   });
 };
 
-module.exports = function (schemaPath, unitCodes, config, taskName, thumbnailSites) {
+module.exports = function (schemaPath, unitCodes, config, taskName, generateJson, thumbnailSites) {
   return tools.getParkList(unitCodes)
     .then(function (validParkList) {
       var taskList = validParkList.map(function (unitCode) {
         return {
           'name': 'Aggregate ' + unitCode,
           'task': aggregatePark,
-          'params': [schemaPath, unitCode, config, taskName, thumbnailSites]
+          'params': [schemaPath, unitCode, config, taskName, generateJson, thumbnailSites]
         };
       });
 
