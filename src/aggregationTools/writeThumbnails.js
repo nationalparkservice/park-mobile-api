@@ -97,15 +97,16 @@ var getThumbnailData = function (media, sites, requestedSites) {
   };
 
   // Filter out the media array so we only have thumbnails
-  var thumbnails = media.filter(function (mediaObject) {
+  var matchedMediaObjects = media.filter(function (mediaObject) {
     return mediaObject.type === 'map_thumbnail';
   });
 
   var findMatch = function (sites, thumbnailId) {
+    // Loop through all of the sites, and try to match the requested thumbnail id
     for (var i = 0; i < sites.length; i++) {
       // Check if there is a thumbnail associated with this site
       if (checkField(sites[i], 'map_thumbnail_image') === thumbnailId) {
-        // Check it we're requesting this thumbnail
+        // Check if we're requesting this thumbnail
         if (requestedSites === true || requestedSites.indexOf(checkField(sites[i], 'id').toString()) >= 0) {
           return i;
         }
@@ -115,8 +116,9 @@ var getThumbnailData = function (media, sites, requestedSites) {
   };
 
   // Add the lat and lon to the thumbnail
-  thumbnails = thumbnails.map(function (thumbnail) {
-    var match = findMatch(sites, thumbnail.id);
+  var thumbnails = matchedMediaObjects.map(function (thumbnail) {
+    var match;
+    match = findMatch(sites, thumbnail.id);
     if (match) {
       thumbnail.latitude = sites[match].latitude;
       thumbnail.longitude = sites[match].longitude;
@@ -128,6 +130,7 @@ var getThumbnailData = function (media, sites, requestedSites) {
   thumbnails = thumbnails.filter(function (a) {
     return !!a;
   });
+
   return thumbnails;
 };
 
