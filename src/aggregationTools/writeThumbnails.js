@@ -91,44 +91,56 @@ var getRequests = function (thumbnailList, unitCode, config) {
 
 // Gets the information about the thumbnail
 var getThumbnailData = function (media, sites, requestedSites) {
+  // /////////////////////
+  // Functions
   // Quick and dirty want to get around issues where the parent is undefined
   var checkField = function (parents, field) {
     return parents && parents[field] ? parents[field] : '';
   };
 
-  // Filter out the media array so we only have thumbnails
-  var matchedMediaObjects = media.filter(function (mediaObject) {
-    return mediaObject.type === 'map_thumbnail';
-  });
-
   var findMatch = function (sites, thumbnailId) {
     // Loop through all of the sites, and try to match the requested thumbnail id
+    var thumbnailImage;
     for (var i = 0; i < sites.length; i++) {
       // Check if there is a thumbnail associated with this site
-      if (checkField(sites[i], 'map_thumbnail_image') === thumbnailId) {
-        // Check if we're requesting this thumbnail
-        if (requestedSites === true || requestedSites.indexOf(checkField(sites[i], 'id').toString()) >= 0) {
-          return i;
-        }
+      thumbnailImage = checkField(sites[i], 'map_thumbnail_image');
+      if (thumbnailImage.toString() === thumbnailId.toString()) {
+        return i;
       }
     }
     return null;
   };
+  // End function
+  // ////////////////////////////
 
-  // Add the lat and lon to the thumbnail
-  var thumbnails = matchedMediaObjects.map(function (thumbnail) {
-    var match;
-    match = findMatch(sites, thumbnail.id);
-    if (match) {
-      thumbnail.latitude = sites[match].latitude;
-      thumbnail.longitude = sites[match].longitude;
-    }
-    return match ? thumbnail : null;
+  // First we filter out the media array so we only have thumbnails
+  var mediaThumbnails = media.filter(function (mediaObject) {
+    return mediaObject.type === 'map_thumbnail';
   });
 
-  // Remove the unmatched thumbnails
+  // If we are requesting specific sites, only check for media matched in those
+  var filteredSites = sites.filter(function (site) {
+    return requestedSites === true || requestedSites.filter(function (s) {
+      var id = checkField(site, 'id');
+      return id.toString() === s || id === s;
+    }).length > 0;
+  });
+
+  // Next we need to add the lat and lon for all of these thumbnails
+  // We need to go through the app.json sites to find the matching sites
+  var thumbnails = mediaThumbnails.map(function (thumbnail) {
+    var match;
+    match = findMatch(filteredSites, thumbnail.id);
+    if (match !== null) {
+      thumbnail.latitude = filteredSites[match].latitude;
+      thumbnail.longitude = filteredSites[match].longitude;
+    }
+    return match !== null ? thumbnail : null;
+  });
+
+  // Remove any unmatched thumbnails
   thumbnails = thumbnails.filter(function (a) {
-    return !!a;
+    return a !== null;
   });
 
   return thumbnails;
