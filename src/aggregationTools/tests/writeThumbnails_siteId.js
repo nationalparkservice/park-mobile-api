@@ -4,7 +4,7 @@ var writeThumbnails = require('../writeThumbnails');
 var config = require('../../../config');
 var schemaFile = './app.schema.json';
 var unitCode = 'goga';
-var siteId = '657';
+var siteId = '772';
 
 console.log('Generating Data');
 generateData(schemaFile, unitCode, config)
@@ -20,7 +20,7 @@ generateData(schemaFile, unitCode, config)
             console.log('************* Individual Thumbnails COMPLETED ****************');
             console.log('Success: ');
           }).catch(function (e) {
-            console.log('Individual Thumbnail Error: ');
+            console.log('Individual Thumbnail Error: ', e);
           });
       })
       .catch(function (e) {
