@@ -18,7 +18,7 @@ var tools = {
         returnValue = tools.format.number(value);
       } else if (types[0] === 'array' && transformation && value) {
         if (transformation === 'StringToArray') {
-          tempValue = value.replace(/^\[|\]$/g, '').split(',');
+          tempValue = value.toString().replace(/^\[|\]$/g, '').split(',');
           returnValue = [];
           if (schemaPart.source) {
             // Map the values to the source
