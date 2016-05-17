@@ -6,7 +6,13 @@
     "format": "cartodb",
     "path": "places_mobile_parks",
     "sql": {
-      "fields": ["*", "ST_AsGeoJSON(ST_Envelope(the_geom)) AS \"bbox\""],
+      "fields": [
+        "*",
+        "ST_XMax(ST_Envelope(the_geom)) AS xmax",
+        "ST_XMin(ST_Envelope(the_geom)) AS xmin",
+        "ST_YMax(ST_Envelope(the_geom)) AS ymax",
+        "ST_YMin(ST_Envelope(the_geom)) AS ymin"
+      ],
       "orderby": "",
       "table": "places_mobile_parks",
       "url": "https://nps.cartodb.com/api/v1/sql?&q=",
@@ -46,9 +52,46 @@
       }
     },
     "bbox": {
-      "noColumn": true,
-      "description": "JSON Representation of the bounding box",
-      "type": ["string", "null"]
+      "alias": "cartodb_id",
+      "description": "Side coordinates of the bounding box",
+      "source": {
+        "format": "cartodb",
+        "path": "places_mobile_parks",
+        "sql": {
+          "fields": ["*"],
+          "orderby": "",
+          "table": "places_mobile_parks",
+          "url": "https://nps.cartodb.com/api/v1/sql?&q=",
+          "where": "1 != 1"
+        },
+        "type": "http"
+      },
+      "transformation": "first",
+      "type": ["object", "null"],
+      "key": "cartodb_id",
+      "type": ["object", "null"],
+      "properties": {
+        "xmax": {
+          "noColumn": true,
+          "description": "The top coordinate",
+          "type": ["string", "null"]
+        },
+        "xmin": {
+          "noColumn": true,
+          "description": "The bottom coordinate",
+          "type": ["number", "null"]
+        },
+        "ymax": {
+          "noColumn": true,
+          "description": "The left coordinate",
+          "type": ["number", "null"]
+        },
+        "ymin": {
+          "noColumn": true,
+          "description": "The right coordinate",
+          "type": ["number", "null"]
+        }
+      }
     },
     "categories": {
       "description": "Categories that are associated with the sites",
