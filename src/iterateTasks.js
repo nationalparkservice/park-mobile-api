@@ -35,62 +35,65 @@ module.exports = function (list, taskName, verbose, errorArray) {
   var messages = [];
   messages._iterateTasksStats = [];
   var report = reporter(verbose);
-  return new Promise(function (listResolve, listReject) {
+  return new Promise(function (resolve, reject) {
     var exec = function (sublist, msgList, callback) {
-      var nextList = [];
-      var params = Array.isArray(sublist[0].params) ? sublist[0].params : [sublist[0].params];
-      params = applyParams(params, list, msgList);
-      report('*** Executing "' + taskName + '" Task ***\n\t', sublist[0].name);
+      // Keep all callbacks truly asynchronous (https://howtonode.org/understanding-process-next-tick)
+      process.nextTick(function () {
+        var nextList = [];
+        var params = Array.isArray(sublist[0].params) ? sublist[0].params : [sublist[0].params];
+        params = applyParams(params, list, msgList);
+        report('*** Executing "' + taskName + '" Task ***\n\t', sublist[0].name);
 
-      var taskResObj = {};
-      var task = applyParams([sublist[0].task], list, msgList)[0];
-      try {
-        var taskRes = task.apply(
-          sublist[0].context,
-          params
-        );
-        if (taskRes && taskRes.then && typeof taskRes.then === 'function' && taskRes.catch && typeof taskRes.catch === 'function') {
-          // This is a bluebird function
-          taskResObj = taskRes;
-        } else {
-          // it's an imposter!
-          taskResObj.then = taskRes && taskRes.then || function (thenFn) {
-            thenFn(taskRes);
+        var taskResObj = {};
+        var task = applyParams([sublist[0].task], list, msgList)[0];
+        try {
+          var taskRes = task.apply(
+            sublist[0].context,
+            params
+          );
+          if (taskRes && taskRes.then && typeof taskRes.then === 'function' && taskRes.catch && typeof taskRes.catch === 'function') {
+            // This is a bluebird function
+            taskResObj = taskRes;
+          } else {
+            // it's an imposter!
+            taskResObj.then = taskRes && taskRes.then || function (thenFn) {
+              thenFn(taskRes);
+              return taskResObj;
+            };
+            taskResObj.catch = taskRes && taskRes.catch || function (catchFn) {
+              return taskResObj;
+            };
+          }
+        } catch (e) {
+          taskResObj.then = function (catchFn) {
             return taskResObj;
           };
-          taskResObj.catch = taskRes && taskRes.catch || function (catchFn) {
+          taskResObj.catch = function (catchFn) {
+            e.message = '[' + sublist[0].name + '] ' + e.message;
+            catchFn(e);
             return taskResObj;
           };
         }
-      } catch (e) {
-        taskResObj.then = function (catchFn) {
-          return taskResObj;
-        };
-        taskResObj.catch = function (catchFn) {
-          e.message = '[' + sublist[0].name + '] ' + e.message;
-          catchFn(e);
-          return taskResObj;
-        };
-      }
-      var start = new Date().getTime();
-      taskResObj.then(function (msg) {
-        var end = new Date().getTime();
-        messages.push(msg);
-        if (sublist[0].name && parseInt(sublist[0].name, 10).toString() !== sublist[0].name.toString()) {
-          messages[sublist[0].name.toString()] = msg;
-        }
-        messages._iterateTasksStats.push((end - start) + 'ms');
-        nextList = sublist.slice(1);
-        if (nextList.length > 0) {
-          exec(nextList, messages, callback);
-        } else {
-          callback(null, messages);
-        }
-      })
-        .catch(function (e) {
-          messages.push(e);
-          callback(messages);
-        });
+        var start = new Date().getTime();
+        taskResObj.then(function (msg) {
+          var end = new Date().getTime();
+          messages.push(msg);
+          if (sublist[0].name && parseInt(sublist[0].name, 10).toString() !== sublist[0].name.toString()) {
+            messages[sublist[0].name.toString()] = msg;
+          }
+          messages._iterateTasksStats.push((end - start) + 'ms');
+          nextList = sublist.slice(1);
+          if (nextList.length > 0) {
+            exec(nextList, messages, callback);
+          } else {
+            callback(null, messages);
+          }
+        })
+          .catch(function (e) {
+            messages.push(e);
+            callback(messages);
+          });
+      });
     };
 
     if (list.length > 0) {
@@ -101,13 +104,15 @@ module.exports = function (list, taskName, verbose, errorArray) {
         if (e) {
           resolveValue = errorArray ? e : e[e.length - 1];
           resolveValue.taskName = taskName;
-          listReject(resolveValue);
+          reject(resolveValue);
         } else {
-          listResolve(r);
+          resolve(r);
         }
       });
     } else {
-      listResolve({});
+      process.nextTick(function () {
+        resolve({});
+      });
     }
   });
 };
