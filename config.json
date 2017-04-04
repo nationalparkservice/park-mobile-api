@@ -1,6 +1,6 @@
 {
   "appName": "NPMap Places-Mobile API",
-  "port": 3002,
+  "port": 3003,
   "cacheBaseUrl": "https://www.nps.gov/npmap/projects/places-mobile",
   "akamaiKey": "./secrets/edgerc",
   "database": {
