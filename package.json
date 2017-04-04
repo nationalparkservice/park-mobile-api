@@ -23,18 +23,20 @@
     "adm-zip": "0.4.7",
     "bluebird": "3.5.0",
     "btoa": "1.1.2",
-    "datawrap": "git+http://github.com/jimmyrocks/datawrap",
+    "datawrap": "git+http://github.com/jimmyrocks/datawrap.git",
     "edgegrid": "^3.0.2",
     "express": "4.15.2",
-    "fandlebars": "git+http://github.com/jimmyrocks/fandlebars",
+    "fandlebars": "git+http://github.com/jimmyrocks/fandlebars.git",
     "form-data": "2.1.2",
     "glob": "7.1.1",
-    "magic-resize": "git+http://github.com/jimmyrocks/magick-resize",
+    "magic-resize": "git+http://github.com/jimmyrocks/magick-resize.git",
     "method-override": "2.3.8",
     "mkdirp": "0.5.1",
     "moment": "2.18.1",
     "multer": "1.3.0",
     "node-persist": "2.0.10",
-    "request": "2.81.0"
+    "pg": "6.1.5",
+    "request": "2.81.0",
+    "ssl-root-cas": "1.2.3"
   }
 }
