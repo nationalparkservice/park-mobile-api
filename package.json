@@ -1,6 +1,6 @@
 {
   "name": "places-mobile-api",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Adds images to a storage device",
   "keywords": [
     "nps",
@@ -8,16 +8,10 @@
   ],
   "author": "Jim McAndrew <james_mcandrew@partner.nps.gov>",
   "license": "Public Domain",
-  "contributors": [
-    {
-      "name": "Jim McAndrew",
-      "email": "james_mcandrew@partner.nps.gov"
-    },
-    {
-      "name": "Nate Irwin",
-      "email": "nate_irwin@nps.gov"
-    }
-  ],
+  "contributors": [{
+    "name": "Jim McAndrew",
+    "email": "james_mcandrew@partner.nps.gov"
+  }],
   "scripts": {
     "start": "node app"
   },
