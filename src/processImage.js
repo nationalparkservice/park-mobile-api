@@ -50,16 +50,21 @@ module.exports = function (req, origRes) {
   var uuid = (inUuid && inUuid.trim().length > 0) ? inUuid : null;
   var unitCode = req.body.unitCode || req.params.unitCode;
 
+  files = {};
+  req.files.forEach(function(file) {
+    files[file.fieldname] = file;
+  });
+
   checkMountStatus(config, function (mountE, mountR) {
     if (!mountE && mountR) {
-      if (req.files[field] && unitCode && req.method !== 'DELETE' && req.body.del !== 'DELETE') {
+      if (files[field] && unitCode && req.method !== 'DELETE' && req.body.del !== 'DELETE') {
         // Resize Image
         // We have files, a unitCode, and we're not trying to delete
         // Get the uuid or create one
         uuid = uuid || createUuid();
         writeDebug('Creating with uuid ' + uuid, req);
         resizeImages({
-          'file': req.files[field].path,
+          'file': files[field].path,
           'fileTypes': Array.isArray(req.body.types) ? req.body.types : [req.body.types],
           'mediaDirectory': config.fileLocation + '/' + unitCode + '/media/',
           'uuid': uuid
@@ -69,7 +74,7 @@ module.exports = function (req, origRes) {
           })
           .catch(function (err) {
             // Delete the original file
-            fs.unlink(req.files[field].path, function () {
+            fs.unlink(files[field].path, function () {
               // Don't catch errors with deleting the file, the error is usually "not found", and we already have a more import error to return
               reportError(err, res);
             });
@@ -77,8 +82,8 @@ module.exports = function (req, origRes) {
       } else if (uuid && unitCode && (req.method === 'DELETE' || req.body.del === 'DELETE')) {
         writeDebug('Deleting with uuid ' + uuid, req);
         // Delete an image
-        if (req.files[field] && req.files[field].path) {
-          fs.unlinkSync(req.files[field].path);
+        if (files[field] && files[field].path) {
+          fs.unlinkSync(files[field].path);
         }
         deleteImages({
           'mediaDirectory': config.fileLocation + '/{{unitCode}}/media/',
@@ -103,7 +108,7 @@ module.exports = function (req, origRes) {
           }
         } else if (!unitCode) {
           reportError('You must include a unit code in order to upload an image', res);
-        } else if (!req.files[field]) {
+        } else if (!files[field]) {
           reportError('You must include a file to be uploaded', res);
         } else {
           reportError('Unknown error', res);
