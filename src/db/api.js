@@ -1,17 +1,52 @@
 var resWrapper = require('../resWrapper');
 var queryDb = require('./queryDb');
 
+var wkx = require('wkx');
+
+var toGeoJson = function (result, geomColumn) {
+  geomColumn = geomColumn || 'the_geom';
+  var returnValue = {
+    'type': 'FeatureCollection',
+    'features': []
+  };
+  var feature = {
+    'type': 'Feature',
+    'geometry': {},
+    'properties': {}
+  };
+
+  result.rows.forEach(function (row) {
+    var newFeature = JSON.parse(JSON.stringify(feature));
+    if (row[geomColumn]) {
+      newFeature.properties = row;
+      newFeature.geometry = wkx.Geometry.parse(new Buffer(row[geomColumn], 'hex')).toGeoJSON();
+      if (newFeature.geometry && newFeature.geometry.type) {
+        returnValue.features.push(newFeature);
+      }
+    }
+  });
+
+  return returnValue;
+};
+
 var runQuery = function (req, res, accept) {
   var newRes = resWrapper(req, res);
-  var q = decodeURIComponent(req.params.q);
-  var format = decodeURIComponent(req.params.format || 'json').toLowerCase();
+  console.log(req);
+  var q = decodeURIComponent(req.query.q);
+  var format = decodeURIComponent(req.query.format || 'json').toLowerCase();
+  var cb = req.query.cb && decodeURIComponent(req.query.cb);
+  console.log('q', q);
 
   if (q.match(accept)) {
-    queryDb(sql, function (e, r) {
+    queryDb(q, function (e, r) {
       if (e) {
         newRes.error('Database Error: ' + e);
       } else {
-        newRes.send(r);
+        var result = r;
+        if (format === 'geojson') {
+          result = toGeoJson(r);
+        }
+        newRes.send(result, {callback: cb});
       }
     });
   } else {
