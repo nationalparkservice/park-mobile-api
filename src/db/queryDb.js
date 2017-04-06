@@ -4,7 +4,7 @@ const pool = require('./lib/pool');
 // after we're done nothing has to be taken care of
 // we don't have to return any client to the pool or close a connection
 var insecureQuery = function (queryString, callback) {
-  pool.query(query, [], callback);
+  pool.query(queryString, [], callback);
 };
 
 module.exports = function (q, callback) {
