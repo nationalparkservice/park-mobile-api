@@ -37,6 +37,7 @@
     "node-persist": "2.0.10",
     "pg": "6.1.5",
     "request": "2.81.0",
-    "ssl-root-cas": "1.2.3"
+    "ssl-root-cas": "1.2.3",
+    "wkx": "0.4.1"
   }
 }
