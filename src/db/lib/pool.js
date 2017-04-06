@@ -4,11 +4,12 @@ const pg = require('pg');
 // and client options
 // note: all config is optional and the environment variables
 // will be read if the config is not present
+// TODO: Move this to the config
 var config = {
-  user: 'postgres', // env var: PGUSER
-  database: 'mobile', // env var: PGDATABASE
-  password: 'postgres', // env var: PGPASSWORD
-  host: 'localhost', // Server hosting the postgres database
+  user: 'mobile', // env var: PGUSER
+  database: 'mobile_dev', // env var: PGDATABASE
+  password: 'mobile', // env var: PGPASSWORD
+  host: '10.147.153.191', // Server hosting the postgres database
   port: 5432, // env var: PGPORT
   max: 10, // max number of clients in the pool
   idleTimeoutMillis: 30000 // how long a client is allowed to remain idle before being closed
