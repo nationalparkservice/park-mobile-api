@@ -6,18 +6,22 @@ var contentTypes = {
   'object': 'application/json'
 };
 
-module.exports = function(req, origRes) {
+module.exports = function (req, origRes) {
   var responseUuid = createUuid(),
     newRes = {
-      'error': function(error) {
+      'error': function (error) {
         return newRes.send(error, {
           status: 500
         });
       },
-      'send': function(result, options) {
-        var buf, newResult = typeof result === 'object' ? JSON.stringify(result, null, 2) : result.toString(),
-          status = options && options.status || '200',
-          returnValue;
+      'send': function (result, options) {
+        var buf;
+        var newResult = typeof result === 'object' ? JSON.stringify(result, null, 2) : result.toString();
+        if (options.callback) {
+          newResult = 'function ' + options.callback + '(){return ' + newResult  + ';}';
+        }
+        var status = options && options.status || '200';
+        var returnValue;
         if (!origRes.headersSent) {
           origRes.status(status);
           origRes.set({
@@ -29,7 +33,7 @@ module.exports = function(req, origRes) {
           if (req.headers['accept-encoding'] && req.headers['accept-encoding'].split(',').indexOf('gzip') >= 0) {
             origRes.set('Content-Encoding', 'gzip');
             buf = new Buffer(newResult, 'utf-8');
-            zlib.gzip(buf, function(err, zippedResult) {
+            zlib.gzip(buf, function (err, zippedResult) {
               returnValue = origRes.end(zippedResult);
             });
           } else {
