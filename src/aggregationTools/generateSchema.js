@@ -149,6 +149,8 @@ var tools = {
       var tryRows = tools.read.rows(schemaPart, data, filterBy);
       if (tryRows && tryRows[0] && tryRows[0][value]) {
         returnValue = tryRows[0][value];
+      } else if (typeof schemaPart[value] === 'string') {
+        returnValue = schemaPart[value];
       }
       return returnValue;
     }
