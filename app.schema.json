@@ -660,6 +660,10 @@
             "description": "Description of the site",
             "type": ["string", "null"]
           },
+          "classification": {
+            "description": "The classification of site (primary, secondary, etc)",
+            "type": ["string", "null"]
+          },
           "geofence_buffer_in_meters": {
             "default": 10,
             "description": "Distance for the geofence",
