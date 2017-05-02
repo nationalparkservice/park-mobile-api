@@ -31,9 +31,10 @@ var toGeoJson = function (result, geomColumn) {
 
 var runQuery = function (req, res, accept) {
   var newRes = resWrapper(req, res);
-  console.log(req);
-  var q = decodeURIComponent(req.query.q);
-  var format = decodeURIComponent(req.query.format || 'json').toLowerCase();
+  // console.log(req);
+  console.log(req.body);
+  var q = decodeURIComponent(req.query.q || req.body.q);
+  var format = decodeURIComponent(req.query.format || req.body.format || 'json').toLowerCase();
   var cb = req.query.cb && decodeURIComponent(req.query.cb);
   console.log('q', q);
 
@@ -58,10 +59,10 @@ module.exports = function (schema) {
   return [{
     'name': 'QUERY database',
     'description': 'Runs a SQL Statement on the database, with no restrictions or validations at all',
-    'method': 'GET',
+    'method': 'POST',
     'path': '/secure',
     'process': function (req, res) {
-      accept = new RegExp(/^(select|insert into|delete from|update) /i);
+      var accept = new RegExp(/^(select|insert into|delete from|update) /i);
       runQuery(req, res, accept);
     }
   }, {
@@ -70,7 +71,7 @@ module.exports = function (schema) {
     'method': 'GET',
     'path': '/select',
     'process': function (req, res) {
-      accept = new RegExp(/^(select) /i);
+      var accept = new RegExp(/^(select) /i);
       runQuery(req, res, accept);
     }
   }];
