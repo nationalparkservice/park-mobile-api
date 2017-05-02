@@ -1,0 +1,185 @@
+{
+  "initial": {
+    "dpi": 72,
+    "extension": ".png",
+    "height": 600,
+    "quality": 50,
+    "width": 800
+  },
+  "thumbnail_mask": {
+    "dpi": 72,
+    "extension": ".png",
+    "height": 67,
+    "mask": "https://nationalparkservice.github.io/data/places_mobile/icons/mask-alt.png",
+    "quality": 60,
+    "requestHeight": 67,
+    "requestWidth": 57,
+    "width": 57
+  },
+  "thumbnail2x_mask": {
+    "dpi": 72,
+    "extension": "@2x.png",
+    "height": 134,
+    "mask": "https://nationalparkservice.github.io/data/places_mobile/icons/mask-alt@2x.png",
+    "quality": 60,
+    "requestHeight": 67,
+    "requestWidth": 57,
+    "width": 114
+  },
+  "thumbnail3x_mask": {
+    "dpi": 72,
+    "extension": "@2x.png",
+    "height": 201,
+    "mask": "https://nationalparkservice.github.io/data/places_mobile/icons/mask-alt@3x.png",
+    "quality": 60,
+    "requestHeight": 100,
+    "requestWidth": 85,
+    "width": 171
+  },
+  "thumbnail_tablet_mask": {
+    "dpi": 72,
+    "extension": ".png",
+    "height": 67,
+    "mask": "https://nationalparkservice.github.io/data/places_mobile/icons/mask-alt.png",
+    "quality": 60,
+    "requestHeight": 67,
+    "requestWidth": 57,
+    "width": 57
+  },
+  "thumbnail_tablet_2x_mask": {
+    "dpi": 72,
+    "extension": "@2x.png",
+    "height": 134,
+    "mask": "https://nationalparkservice.github.io/data/places_mobile/icons/mask-alt@2x.png",
+    "quality": 60,
+    "requestHeight": 67,
+    "requestWidth": 57,
+    "width": 114
+  },
+  "tablet": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 478,
+    "quality": 60,
+    "width": 768
+  },
+  "tablet2x": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 956,
+    "quality": 60,
+    "width": 1536
+  },
+  "phone": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 240,
+    "quality": 60,
+    "width": 320
+  },
+  "phone2x": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 480,
+    "quality": 60,
+    "width": 640
+  },
+  "image_350": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 260,
+    "quality": 60,
+    "width": 350
+  },
+  "image_480": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 320,
+    "quality": 60,
+    "width": 480
+  },
+  "image_640": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 504,
+    "quality": 60,
+    "width": 640
+  },
+  "image_768": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 480,
+    "quality": 60,
+    "width": 768
+  },
+  "image_960": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 640,
+    "quality": 60,
+    "width": 960
+  },
+  "image_1080": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 810,
+    "quality": 60,
+    "width": 1080
+  },
+  "image_1536": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 1152,
+    "quality": 60,
+    "width": 1536
+  },
+  "image_350x263": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 260,
+    "quality": 60,
+    "width": 263
+  },
+  "image_480x360": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 320,
+    "quality": 60,
+    "width": 360
+  },
+  "image_640x480": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 504,
+    "quality": 60,
+    "width": 480
+  },
+  "image_768x576": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 480,
+    "quality": 60,
+    "width": 576
+  },
+  "image_960x720": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 640,
+    "quality": 60,
+    "width": 720
+  },
+  "image_1080x810": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 810,
+    "quality": 60,
+    "width": 810
+  },
+  "image_1536x1152": {
+    "dpi": 72,
+    "extension": ".jpg",
+    "height": 1152,
+    "quality": 60,
+    "width": 1152
+  }
+}
