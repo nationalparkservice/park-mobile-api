@@ -1,3 +1,4 @@
+/* global require, Buffer */
 var resWrapper = require('../resWrapper');
 var queryDb = require('./queryDb');
 
@@ -41,21 +42,26 @@ var runQuery = function (req, res, accept) {
   if (q.match(accept)) {
     queryDb(q, function (e, r) {
       if (e) {
+        console.log('e', e);
         newRes.error('Database Error: ' + e);
       } else {
         var result = r;
         if (format === 'geojson') {
           result = toGeoJson(r);
         }
-        newRes.send(result, {callback: cb});
+        console.log('send');
+        newRes.send(result, {
+          callback: cb
+        });
       }
     });
   } else {
+    console.log('e2', q);
     newRes.error('Invalid SQL Statement ' + q);
   }
 };
 
-module.exports = function (schema) {
+module.exports = function () {
   return [{
     'name': 'QUERY database',
     'description': 'Runs a SQL Statement on the database, with no restrictions or validations at all',
