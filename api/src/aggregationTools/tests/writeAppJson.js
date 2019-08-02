@@ -1,7 +1,7 @@
 var fs = require('fs');
 var Bluebird = require('datawrap').Bluebird;
 var writeAppJson = require('../writeAppJson');
-var config = require('../../../config');
+var config = require('../../buildConfig')();
 fs = Bluebird.promisifyAll(fs);
 
 var jsonFilePath = '../../../app.schema.json';
