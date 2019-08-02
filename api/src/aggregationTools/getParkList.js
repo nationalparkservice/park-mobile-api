@@ -1,11 +1,10 @@
 // Requires
 var Promise = require('bluebird');
-var config = require('../../config');
+var config = require('../buildConfig')();
 var datawrap = require('datawrap');
 var fs = require('fs');
 
 // Tools
-config.database.cartodb.apiKey = fs.readFileSync(config.database.cartodb.apiKey).toString();
 var database = datawrap(config.database.cartodb, config.database.defaults);
 
 module.exports = function (unitCode) {
