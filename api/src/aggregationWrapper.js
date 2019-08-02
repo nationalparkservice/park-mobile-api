@@ -1,22 +1,22 @@
-var config = require('../config');
+var config = require('./buildConfig')();
 var createUuid = require('./createUuid');
 var aggregate = require('./aggregate');
 var resWrapper = require('./resWrapper');
 
-var success = function (taskName, result) {
+var success = function(taskName, result) {
   return result.send({
     'taskName': taskName
   });
 };
 
-var createThumbnailList = function (siteId) {
+var createThumbnailList = function(siteId) {
   // Thumbnails
   var thumbnailList = [];
 
   if (siteId && (siteId.toLowerCase() === 'true' || siteId.toLowerCase() === 'all')) {
     return true;
   } else if (siteId) {
-    siteId.split(',').forEach(function (thumbnail) {
+    siteId.split(',').forEach(function(thumbnail) {
       if (!isNaN(thumbnail)) {
         thumbnailList.push(parseInt(thumbnail, 10));
       }
@@ -27,13 +27,13 @@ var createThumbnailList = function (siteId) {
   }
 };
 
-var reportError = function (error, result) {
+var reportError = function(error, result) {
   return result.error({
     'Error': error
   });
 };
 
-module.exports = function (request, originalResult) {
+module.exports = function(request, originalResult) {
   // Wrap the result
   var newResult = resWrapper(request, originalResult);
 
@@ -42,8 +42,6 @@ module.exports = function (request, originalResult) {
 
   // Parse out the unit code from either the body or the params
   var unitCode = (request.body && request.body.unitCode) || (request.params && request.params.unitCode);
-
-  // config is sent directly from the config file
 
   // determine if we will be generating json (includes 'generate/json')
   var generateJson = !!request.originalUrl.match(/generate\/json/g);
@@ -56,10 +54,10 @@ module.exports = function (request, originalResult) {
   }
 
   aggregate('app.schema.json', unitCode, config, taskName, generateJson, thumbnails)
-    .then(function () {
+    .then(function() {
       success(taskName, newResult);
     })
-    .catch(function (error) {
+    .catch(function(error) {
       reportError(error, newResult);
     });
 };
