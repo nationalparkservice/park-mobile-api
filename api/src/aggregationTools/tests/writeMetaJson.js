@@ -1,6 +1,6 @@
 var fs = require('fs');
 var writeMetaJson = require('../writeMetaJson');
-var config = require('../../../config');
+var config = require('../../buildConfig')();
 var removeGithubFile = require('../../github/remove');
 
 var jsonFilePath = '../../../app.schema.json';
