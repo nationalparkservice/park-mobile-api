@@ -1,7 +1,7 @@
 var generateData = require('../generateData');
 var generateSchema = require('../generateSchema');
 var writeThumbnails = require('../writeThumbnails');
-var config = require('../../../config');
+var config = require('../../buildConfig')();
 var schemaFile = './app.schema.json';
 var unitCode = 'Brooklyn';
 
