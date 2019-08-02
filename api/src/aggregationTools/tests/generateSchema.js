@@ -1,7 +1,7 @@
 var generateData = require('../generateData');
 var generateSchema = require('../generateSchema');
 var schemaFile = '../../../app.schema.json';
-var config = require('../../../config');
+var config = require('../../buildConfig')();
 
 generateData(schemaFile, 'klgo', config)
   .then(function(r) {
