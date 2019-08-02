@@ -1,5 +1,5 @@
 var aggregate = require('../../aggregate');
-var config = require('../../../config');
+var config = require('../../buildConfig')();
 
 aggregate('../../../app.schema.json', ['Brooklyn'] , config)
   .then(function(r) {
