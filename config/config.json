@@ -1,31 +1,5 @@
 {
-  "appName": "NPMap Places-Mobile API",
-  "port": 3003,
-  "cacheBaseUrl": "https://www.nps.gov/npmap/projects/places-mobile",
-  "akamaiKey": "./secrets/edgerc",
-  "database": {
-    "cartodb": {
-      "account": "nps",
-      "apiKey": "./secrets/cartodb",
-      "type": "cartodb"
-    },
-    "defaults": {
-      "rootDirectory": "{{env.PWD}}/test/sql",
-      "delimiter": ";",
-      "fileDesignator": "file:///",
-      "fileOptions": {
-        "encoding": "utf8"
-      }
-    }
-  },
   "debug": true,
-  "fileLocation": "/mnt/npmap/projects/places-mobile",
-  "testFileLocation": "/mnt/npmap/projects/places-mobile/test.txt",
-  "htmlDirectory": "html",
-  "mapbox": {
-    "token": "./secrets/mapbox"
-  },
-  "tempFileLocation": "/home/npmap/places_mobile_tmp",
   "zipFields": {
     "640": {
       "commonImage": "image_640",
@@ -120,22 +94,6 @@
     "serviceIcon": {
       "reference": "sites.services",
       "type": "icon"
-    }
-  },
-  "testZipTemplate": {
-    "video": {
-      "type": "video"
-    },
-    "audio": {
-      "type": "audio"
-    },
-    "exploreSiteThumbnail": {
-      "reference": "sites.primary_image",
-      "type": "image"
-    },
-    "exploreSiteThumbnailAndroid": {
-      "reference": "sites.primary_image",
-      "type": "image"
     }
   }
 }
