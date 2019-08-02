@@ -3,16 +3,14 @@ var EdgeGrid = require('edgegrid');
 var eg;
 
 function updateList (fileList, unitCode, config) {
-  eg = eg || new EdgeGrid({
-    path: config.akamaiKey
-  });
+  eg = eg || new EdgeGrid.apply(this, config.akamaiKey);
 
   return new Promise(function (fulfill, reject) {
     var urlList = fileList.map(function (file) {
       return config.cacheBaseUrl + '/' + unitCode + '/' + file;
     });
-
     if (urlList.length === 0) {
+
       fulfill('no purge');
     } else {
       // Create the Auth Object with the Payload
