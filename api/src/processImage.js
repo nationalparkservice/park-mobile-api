@@ -1,5 +1,5 @@
 var checkMountStatus = require('./checkMountStatus');
-var config = require('../config');
+var config = require('./buildConfig')();
 var createUuid = require('./createUuid');
 var deleteImages = require('./deleteImages');
 var fs = require('fs');
