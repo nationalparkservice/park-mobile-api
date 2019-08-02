@@ -1,5 +1,5 @@
 var purgeCache = require('../purgeCache');
-var config = require('../../../config');
+var config = require('../../buildConfig')();
 var today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
 
 purgeCache(today, 'heho', config)
