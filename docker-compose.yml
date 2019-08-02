@@ -7,8 +7,9 @@ services:
       context: ./api
       dockerfile: ./Dockerfile
     env_file:
-      - ./configs/environment.env
+      - ./config/environment.env
     volumes:
       - ./api/src:/code/src
-      - ./api/api.js:/code/api.js
+      - ./api/app.js:/code/app.js
+      - ./config:/code/config
     tty: true
