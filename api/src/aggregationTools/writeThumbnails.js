@@ -7,7 +7,7 @@ var magickResizeWrapper = require('../magickResizeWrapper');
 var magickTypes = require('../../node_modules/magick-resize/types');
 var mkdirp = require('mkdirp');
 var path = require('path');
-var thumbnailSettings = require('../../thumbnailSettings');
+var thumbnailSettings = require('../../config/thumbnailSettings');
 
 Promise.promisifyAll(fs);
 
