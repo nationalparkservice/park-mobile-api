@@ -12,4 +12,5 @@ services:
       - ./api/src:/code/src
       - ./api/app.js:/code/app.js
       - ./config:/code/config
+      - /npmap/projects/places-mobile:/places-mobile
     tty: true
