@@ -4,7 +4,7 @@ module.exports = function() {
   // Add the environment variables in from the config file
   var configEnvs = {
     appName: process.env.API_APP_NAME,
-    debug: process.env.APP_DEBUG_MODE,
+    debug: !!process.env.APP_DEBUG_MODE,
     port: process.env.API_PORT,
     cacheBaseUrl: process.env.APP_BASE_URL,
     akamaiKey: [ //https://www.npmjs.com/package/edgegrid
@@ -18,7 +18,8 @@ module.exports = function() {
         'account': process.env.CARTODB_ACCOUNT,
         'apiKey': process.env.CARTODB_API_KEY,
         'type': 'cartodb',
-        'path': process.env.CARTODB_PATH
+        'protocol': process.env.CARTODB_PROTOCOL,
+        'url': process.env.CARTODB_URL
       },
       defaults: undefined
     },
