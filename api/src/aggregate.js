@@ -1,6 +1,5 @@
 var iterateTasks = require('./iterateTasks');
 var Promise = require('bluebird');
-var checkMountStatus = require('./checkMountStatus');
 var addStatusTools = require('./addStatuses');
 
 // Require the external tools
@@ -65,13 +64,7 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, generateJs
     }
     taskList = addStatusTools(taskList, taskName);
 
-    checkMountStatus(config, function (mountE, mountR) {
-      if (!mountE && mountR) {
-        return iterateTasks(taskList, 'Main Task List', config.debug);
-      } else {
-        throw new Error('Error mounting drive: ' + mountE);
-      }
-    });
+    return iterateTasks(taskList, 'Main Task List', config.debug);
   });
 };
 
