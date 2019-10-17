@@ -6,6 +6,8 @@ services:
     build:
       context: ./api
       dockerfile: ./Dockerfile
+    ports:
+      - 3001:3001
     env_file:
       - ./config/environment.env
     volumes:
@@ -14,3 +16,4 @@ services:
       - ./config:/code/config
       - /npmap/projects/places-mobile:/places-mobile
     tty: true
+    # command: node /code/app.js
