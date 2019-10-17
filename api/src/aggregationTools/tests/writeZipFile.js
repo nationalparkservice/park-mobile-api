@@ -2,12 +2,11 @@ var generateData = require('../generateData');
 var generateSchema = require('../generateSchema');
 var writeZipFile = require('../writeZipFile');
 var config = require('../../buildConfig')();
-var schemaFile = '../../../app.schema.json';
 var unitCode = 'klgo';
 var sizes = null; //['640', '768', '1536', '1080'];
 
 console.log('Generating Data');
-generateData(schemaFile, unitCode, config)
+generateData(unitCode, config)
   .then(function(data) {
     console.log('************* DATA COMPLETED ****************');
     console.log('Schema Data');
