@@ -60,12 +60,12 @@ module.exports = function (list, taskName, verbose, errorArray) {
               thenFn(taskRes);
               return taskResObj;
             };
-            taskResObj.catch = taskRes && taskRes.catch || function (catchFn) {
+            taskResObj.catch = taskRes && taskRes.catch || function () {
               return taskResObj;
             };
           }
         } catch (e) {
-          taskResObj.then = function (catchFn) {
+          taskResObj.then = function () {
             return taskResObj;
           };
           taskResObj.catch = function (catchFn) {
