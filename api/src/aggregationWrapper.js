@@ -37,7 +37,6 @@ var reportError = function(error, result) {
 module.exports = function(request, originalResult) {
   // Wrap the result
   var newResult = resWrapper(request, originalResult);
-  config.debug && console.log('new res', newResult);
 
   // Create a new task
   var taskName = createUuid();
@@ -55,10 +54,8 @@ module.exports = function(request, originalResult) {
     success(taskName, newResult);
   }
 
-  config.debug && console.log('starting agg');
   aggregate(unitCode, config, taskName, generateJson, thumbnails)
     .then(function() {
-      config.debug && console.log('agg done');
       success(taskName, newResult);
     })
     .catch(function(error) {
