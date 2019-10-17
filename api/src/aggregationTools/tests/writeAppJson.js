@@ -4,8 +4,7 @@ var writeAppJson = require('../writeAppJson');
 var config = require('../../buildConfig')();
 fs = Bluebird.promisifyAll(fs);
 
-var jsonFilePath = '../../../app.schema.json';
-var jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
+var jsonData = config.appSchemaJson;
 
 writeAppJson(jsonData, 'test', config)
   .then(function() {
