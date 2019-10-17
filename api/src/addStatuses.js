@@ -1,8 +1,5 @@
 var Promise = require('bluebird');
-var fs = require('fs');
 var storage = require('node-persist');
-
-fs = Promise.promisifyAll(fs);
 
 var statusFunction = function (status, name) {
   return new Promise(function (fulfill, reject) {
