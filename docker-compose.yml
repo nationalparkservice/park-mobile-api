@@ -3,6 +3,7 @@ version: '3'
 services:
 
   api:
+    restart: always
     build:
       context: ./api
       dockerfile: ./Dockerfile
@@ -14,6 +15,6 @@ services:
       - ./api/src:/code/src
       - ./api/app.js:/code/app.js
       - ./config:/code/config
-      - /npmap/projects/places-mobile:/places-mobile
+      - /mnt/npmap/projects/places-mobile:/places-mobile
     tty: true
     # command: node /code/app.js
