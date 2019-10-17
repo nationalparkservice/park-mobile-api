@@ -15,7 +15,7 @@ var tools = {
 };
 
 var aggregatePark = function (unitCode, config, taskName, generateJson, thumbnailSites) {
-  return new Promise(function (fulfill, reject) {
+  return new Promise(function () {
     var taskList = [{
       'name': 'startDate',
       'task': function () {
