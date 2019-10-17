@@ -138,6 +138,8 @@ module.exports = function(unitCode, config) {
           parkJson: parkData
         });
       })
-      .catch(reject);
+      .catch(function(error) {
+        reject(error);
+      });
   });
 };
