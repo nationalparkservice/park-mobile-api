@@ -1,5 +1,3 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 var Api = require('./src/api');
 var allowXSS = require('./src/allowXSS');
 var express = require('express');
