@@ -2,7 +2,6 @@
 var Promise = require('bluebird');
 var config = require('../buildConfig')();
 var datawrap = require('datawrap');
-var fs = require('fs');
 
 // Tools
 var database = datawrap(config.database.cartodb, config.database.defaults);
