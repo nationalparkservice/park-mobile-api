@@ -1,9 +1,18 @@
 var config = require('../config/config');
+var fs = require('fs');
 
 module.exports = function() {
+  // Load the app.schema.json if it exists
+  var appSchemaJson = undefined;
+  if (process.env.APP_SCHEMA_JSON) {
+    var rawJson = fs.readFileSync(process.env.APP_SCHEMA_JSON, 'utf8');
+    appSchemaJson = JSON.parse(rawJson);
+  }
+
   // Add the environment variables in from the config file
   var configEnvs = {
     appName: process.env.API_APP_NAME,
+    appSchemaJson: appSchemaJson,
     debug: !!process.env.APP_DEBUG_MODE,
     port: process.env.API_PORT,
     cacheBaseUrl: process.env.APP_BASE_URL,
