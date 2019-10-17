@@ -2,11 +2,15 @@ var Promise = require('bluebird');
 var EdgeGrid = require('edgegrid');
 var eg;
 
-function updateList (fileList, unitCode, config) {
-  eg = eg || new EdgeGrid.apply(this, config.akamaiKey);
+function updateList(fileList, unitCode, config) {
+  eg = eg || new EdgeGrid(
+    config.akamaiKey[0],
+    config.akamaiKey[1],
+    config.akamaiKey[2],
+    config.akamaiKey[3]);
 
-  return new Promise(function (fulfill, reject) {
-    var urlList = fileList.map(function (file) {
+  return new Promise(function(fulfill, reject) {
+    var urlList = fileList.map(function(file) {
       return config.cacheBaseUrl + '/' + unitCode + '/' + file;
     });
     if (urlList.length === 0) {
@@ -16,15 +20,14 @@ function updateList (fileList, unitCode, config) {
       // Create the Auth Object with the Payload
       eg.auth({
         body: {
-          action: 'invalidate',
           objects: urlList
         },
-        path: '/ccu/v2/queues/default',
+        path: '/ccu/v3/invalidate/url/production',
         method: 'POST'
       });
 
       // Send the filelist to Akamai
-      eg.send(function (data, response) {
+      eg.send(function(data, response) {
         if (response && response.body) {
           response = JSON.parse(response.body);
           if (response.purgeId) {
