@@ -9,27 +9,6 @@ var iterateTasks = require('../iterateTasks');
 
 Promise.promisifyAll(fs);
 
-var readSchemaFile = function (schemaFile) {
-  return new Promise(function (fulfill, reject) {
-    // Read the Schema File
-    if (schemaFile) {
-      fs.readFileAsync(schemaFile, 'utf8')
-        .then(function (schemaData) {
-          var schema;
-          try {
-            schema = JSON.parse(schemaData);
-            fulfill(schema);
-          } catch (e) {
-            reject('Error Parsing Schema JSON:' + e);
-          }
-        })
-        .catch(reject);
-    } else {
-      reject('No schema');
-    }
-  });
-};
-
 var readTypes = {
   'http': {
     'cartodb': function (schemaPart, unitCode, config) {
@@ -71,7 +50,7 @@ var readTypes = {
           // Assign Table
           sqlParts.text.table = '"' + sqlParts.table + '"';
           // Assign Where Clause
-          sqlParts.text.where = (sqlParts.where ? '(' + sqlParts.where + ') AND ' : '') + '"unit_code"=\'' + unitCode + "'";
+          sqlParts.text.where = (sqlParts.where ? '(' + sqlParts.where + ') AND ' : '') + '"unit_code"=\'' + unitCode + '\'';
           // Assign Order By
           sqlParts.text.extras = sqlParts.orderby ? ' ORDER BY ' + sqlParts.orderby : '';
 
@@ -142,25 +121,22 @@ var readData = function (schema, unitCode, config) {
     }
   };
 
-    // Build the taskList
-    getData(schema);
+  // Build the taskList
+  getData(schema);
 
-    return iterateTasks(taskList)
+  return iterateTasks(taskList);
 };
 
-module.exports = function (schemaPath, unitCode, config) {
-  return new Promise(function (fulfill, reject) {
+module.exports = function(unitCode, config) {
+  return new Promise(function(fulfill, reject) {
     // Read the Schema File
-    readSchemaFile(schemaPath)
-      .then(function (schema) {
-        readData(schema, unitCode, config)
-          .then(function (parkData) {
-            fulfill({
-              schemaJson: schema,
-              parkJson: parkData
-            });
-          })
-          .catch(reject);
+    var schema = JSON.parse(JSON.stringify(config.appSchemaJson));
+    readData(schema, unitCode, config)
+      .then(function(parkData) {
+        fulfill({
+          schemaJson: schema,
+          parkJson: parkData
+        });
       })
       .catch(reject);
   });
