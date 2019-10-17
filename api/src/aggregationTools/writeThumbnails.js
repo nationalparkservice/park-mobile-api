@@ -242,7 +242,7 @@ module.exports = function (appJson, unitCode, config, requestedSites) {
       });
 
       // Run the task list and then either upload the files or send back an error
-      iterateTasks(taskList, "magick Resizer").then(function () {
+      iterateTasks(taskList, 'magick Resizer').then(function () {
         // Success, so move files to the server!
         moveFiles(imgRequests, config)
           .then(function () {
