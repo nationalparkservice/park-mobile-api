@@ -14,7 +14,7 @@ var tools = {
   purgeCache: require('./aggregationTools/purgeCache') // = function(startDate, unitCode, config)
 };
 
-var aggregatePark = function (schemaPath, unitCode, config, taskName, generateJson, thumbnailSites) {
+var aggregatePark = function (unitCode, config, taskName, generateJson, thumbnailSites) {
   return new Promise(function (fulfill, reject) {
     var taskList = [{
       'name': 'startDate',
@@ -27,7 +27,7 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, generateJs
     }, {
       'name': 'GenerateData',
       'task': tools.generateData,
-      'params': [schemaPath, unitCode, config]
+      'params': [unitCode, config]
     }, {
       'name': 'GenerateSchema',
       'task': tools.generateSchema,
@@ -68,14 +68,14 @@ var aggregatePark = function (schemaPath, unitCode, config, taskName, generateJs
   });
 };
 
-module.exports = function (schemaPath, unitCodes, config, taskName, generateJson, thumbnailSites) {
+module.exports = function (unitCodes, config, taskName, generateJson, thumbnailSites) {
   return tools.getParkList(unitCodes)
     .then(function (validParkList) {
       var taskList = validParkList.map(function (unitCode) {
         return {
           'name': 'Aggregate ' + unitCode,
           'task': aggregatePark,
-          'params': [schemaPath, unitCode, config, taskName, generateJson, thumbnailSites]
+          'params': [unitCode, config, taskName, generateJson, thumbnailSites]
         };
       });
 
