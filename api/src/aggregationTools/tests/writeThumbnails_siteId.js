@@ -2,12 +2,11 @@ var generateData = require('../generateData');
 var generateSchema = require('../generateSchema');
 var writeThumbnails = require('../writeThumbnails');
 var config = require('../../buildConfig')();
-var schemaFile = './app.schema.json';
 var unitCode = 'goga';
 var siteId = '788';
 
 console.log('Generating Data');
-generateData(schemaFile, unitCode, config)
+generateData(unitCode, config)
   .then(function (r) {
     console.log('************* DATA COMPLETED ****************');
     console.log('Schema Data');
