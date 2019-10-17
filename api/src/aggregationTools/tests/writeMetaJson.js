@@ -1,10 +1,8 @@
-var fs = require('fs');
 var writeMetaJson = require('../writeMetaJson');
 var config = require('../../buildConfig')();
 var removeGithubFile = require('../../github/remove');
 
-var jsonFilePath = '../../../app.schema.json';
-var jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
+var jsonData = config.appSchemaJson;
 
 writeMetaJson(jsonData, 'test', config)
   .then(function() {
