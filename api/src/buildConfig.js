@@ -14,6 +14,7 @@ module.exports = function() {
     appName: process.env.API_APP_NAME,
     appSchemaJson: appSchemaJson,
     debug: !!process.env.APP_DEBUG_MODE,
+    developmentMode: !!process.env.APP_DEVELOPMENT_MODE,
     port: process.env.API_PORT,
     cacheBaseUrl: process.env.APP_BASE_URL,
     akamaiKey: [ //https://www.npmjs.com/package/edgegrid
