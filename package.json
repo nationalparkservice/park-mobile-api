@@ -25,7 +25,7 @@
     "url": "http://github.com/nationalparkservice/places-mobile-api"
   },
   "dependencies": {
-    "adm-zip": "0.4.7",
+    "adm-zip": "0.4.13",
     "bluebird": "3.5.1",
     "body-parser": "1.18.2",
     "btoa": "1.1.2",
