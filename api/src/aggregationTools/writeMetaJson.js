@@ -12,7 +12,7 @@ module.exports = function (appJson, unitCode, config, appJsonWrites) {
   };
 
   return new Promise(function (fulfill, reject) {
-    filename = config.developmentMode ? 'dev.meta.json' : 'meta.json'
+    var filename = config.developmentMode === 'true' ? 'dev.meta.json' : 'meta.json';
     var filePath = config.fileLocation + '/' + unitCode + '/' + filename;
     var minFilePath = filePath.replace(/\.json$/, '.min.json');
     mkdirp(path.dirname(filePath), function (err) {
