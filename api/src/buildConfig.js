@@ -33,7 +33,9 @@ module.exports = function() {
       },
       defaults: undefined
     },
-    fileLocation: process.env.API_FILE_LOCATION
+    fileLocation: process.env.API_FILE_LOCATION,
+    tempDirLocation: process.env.API_TEMP_DIRECTORY,
+    mapboxToken: process.env.MAPBOX_TOKEN
   };
   // Update config file with our settings
   for (var k in configEnvs) {
