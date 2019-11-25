@@ -17,6 +17,7 @@ module.exports = function (options) {
         f: filePath,
         o: outputFile,
         t: type,
+        s: options.mediaDirectory,
         _deleteOriginal: index === fileTypes.length - 1 // Delete the image on the last task
       }]
     };
