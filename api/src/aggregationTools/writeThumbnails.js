@@ -68,7 +68,6 @@ var formatValue = function (value) {
 var getRequests = function (thumbnailList, unitCode, config) {
   var requestList = [];
   var settings = thumbnailSettings[unitCode] || thumbnailSettings['default'];
-  config.mapbox.token = config.mapbox.token.match('/secrets/') ? fs.readFileSync(config.mapbox.token).toString().replace(/\n/g, '') : config.mapbox.token;
   thumbnailList.map(function (img) {
     settings.map(function (setting) {
       var imgRequest = {
@@ -80,7 +79,7 @@ var getRequests = function (thumbnailList, unitCode, config) {
         imgRequest._filename = img[setting.field];
         imgRequest._unitCode = unitCode;
         imgRequest.url = fandlebars(setting.url, addOffset(objMerge([setting, magickTypes[setting.type], img, {
-          'token': config.mapbox.token
+          'token': config.mapboxToken
         }])));
         requestList.push(imgRequest);
       }
