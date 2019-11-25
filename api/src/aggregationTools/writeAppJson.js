@@ -12,7 +12,7 @@ var bomify = function (text) {
 
 module.exports = function (appJson, unitCode, config) {
   return new Promise(function (fulfill, reject) {
-    filename = config.developmentMode ? 'dev.app.json' : 'app.json'
+    var filename = config.developmentMode === 'true' ? 'dev.app.json' : 'app.json';
     var filePath = config.fileLocation + '/' + unitCode + '/' + filename;
     var minFilePath = filePath.replace(/\.json$/, '.min.json');
     mkdirp(path.dirname(filePath), function (err) {
