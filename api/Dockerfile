@@ -3,7 +3,8 @@ FROM node:12.11.1-alpine
 RUN apk add --no-cache \
   bash \
   git \
-  python2 \ 
+  graphicsmagick \
+  python2 \
   sqlite \
   curl
 
