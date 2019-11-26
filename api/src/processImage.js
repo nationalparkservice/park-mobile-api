@@ -47,12 +47,14 @@ module.exports = function(req, origRes) {
   var field = 'userPhoto'; // The body field where to find the image
   var inUuid = req.params.imageId || req.body.uuid || (req.body.query && (req.body.query.uuid || req.body.query.imageId));
   var uuid = (inUuid && inUuid.trim().length > 0) ? inUuid : null;
-  var unitCode = req.body.unitCode || req.params.unitCode;
+  var unitCode = (req.body && req.body.unitCode) || req.params.unitCode;
 
   var files = {};
-  req.files.forEach(function(file) {
-    files[file.fieldname] = file;
-  });
+  if (req.files) {
+    req.files.forEach(function(file) {
+      files[file.fieldname] = file;
+    });
+  }
 
   if (files[field] && unitCode && req.method !== 'DELETE' && req.body.del !== 'DELETE') {
     // Resize Image
@@ -62,6 +64,7 @@ module.exports = function(req, origRes) {
     writeDebug('Creating with uuid ' + uuid, req);
     resizeImages({
       'file': files[field].path,
+      'extention': '.jpg', //path.extname(files[field].originalname), // This is hardcoded to jpg in the GUI
       'fileTypes': Array.isArray(req.body.types) ? req.body.types : [req.body.types],
       'mediaDirectory': config.fileLocation + '/' + unitCode + '/media/',
       'uuid': uuid
