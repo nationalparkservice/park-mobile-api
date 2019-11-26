@@ -1,15 +1,15 @@
 var iterateTasks = require('./iterateTasks');
 var magickResizeWrapper = require('./magickResizeWrapper');
-var path = require('path');
 
 module.exports = function (options) {
   var filePath = options.file;
   var fileTypes = options.fileTypes;
+  var extention = options.extention;
   var mediaDirectory = options.mediaDirectory.replace(/(\/$)/g, '') + '/';
   var uuid = options.uuid;
 
   var taskList = fileTypes.map(function (type, index) {
-    var outputFile = mediaDirectory + uuid + '_' + type + path.extname(filePath);
+    var outputFile = mediaDirectory + uuid + '_' + type + extention;
     return {
       'name': 'Resize to ' + type,
       'task': magickResizeWrapper,
