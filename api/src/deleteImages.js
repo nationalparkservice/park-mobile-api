@@ -11,7 +11,7 @@ module.exports = function (options) {
   var uuid = options.uuid;
 
   return new Promise(function (fulfill, reject) {
-    glob(uuid + '_*.*', {
+    glob(uuid + '_*', {
       'cwd': mediaDirectory
     }, function (err, files) {
       if (err) {
