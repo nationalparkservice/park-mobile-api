@@ -1,12 +1,12 @@
-var AdmZip = require('adm-zip');
-var Promise = require('bluebird');
+var JSZip = require('jszip');
 var mkdirp = require('mkdirp');
 var path = require('path');
+var fs = require('fs');
 
 var cleanArray = function (array) {
   // removes nulls and duplicates
   var newArray = [];
-  array.forEach(function (item) {
+  array.forEach(item => {
     if ((item || item === 0) && (newArray.indexOf(item) === -1)) {
       newArray.push(item);
     }
@@ -23,9 +23,7 @@ var getMediaList = function (template, appJson) {
     if (branches.length === 1) {
       if (trunk[branches[0]]) {
         if (Array.isArray(trunk[branches[0]])) {
-          trunk[branches[0]].forEach(function (d) {
-            ids.push(d);
-          });
+          trunk[branches[0]].forEach(d => ids.push(d));
         } else {
           ids.push(trunk[branches[0]].id || trunk[branches[0]]);
         }
@@ -42,9 +40,7 @@ var getMediaList = function (template, appJson) {
   if (template.type === 'icon') {
     returnValue = ids;
   } else {
-    returnValue = appJson.media.filter(function (d) {
-      return (d.type && d.type === template.type && ids.indexOf(d.id) >= 0);
-    });
+    returnValue = appJson.media.filter(d => (d.type && d.type === template.type && ids.indexOf(d.id) >= 0));
   }
 
   return returnValue;
@@ -58,20 +54,16 @@ var getFiles = function (mediaTemplate, field, appJson, config, unitCode) {
     // MAGIC
     media = getMediaList(mediaTemplate, appJson);
   } else {
-    media = appJson.media.filter(function (d) {
-      return d.type === mediaTemplate.type;
-    });
+    media = appJson.media.filter(d => d.type === mediaTemplate.type);
   }
 
-  fileList = media.map(function (medium) {
-    return medium[field] ? prefix + medium[field] : null;
-  });
+  fileList = media.map(medium => medium[field] ? prefix + medium[field] : null);
 
   return cleanArray(fileList);
 };
 
 module.exports = function (appJson, unitCode, config, sizes) {
-  return new Promise(function (fulfill, reject) {
+  return new Promise((resolve, reject) => {
     var archiveDirectory = config.fileLocation + '/' + unitCode + '/archives/';
     var allFiles = {};
     sizes = sizes || function () {
@@ -84,7 +76,7 @@ module.exports = function (appJson, unitCode, config, sizes) {
     mkdirp.sync(archiveDirectory);
 
     sizes.forEach(function (size) {
-      var zip = new AdmZip();
+      var zip = new JSZip();
       var fileList = [];
       var errorList = [];
       try {
@@ -96,6 +88,13 @@ module.exports = function (appJson, unitCode, config, sizes) {
           }
         }
         fileList.forEach(function (file) {
+          var fileBuffer;
+          try {
+            fileBuffer = fs.readFileSync(file);
+          } catch(e) {
+            // Report missing file
+            console.log('File missing:', file);
+          }
           var filePath = file.replace(config.fileLocation + '/', '');
           if (filePath.substr(0, 5) !== 'icons') {
             filePath = filePath.replace(/^.+?\//g, '');
@@ -106,20 +105,27 @@ module.exports = function (appJson, unitCode, config, sizes) {
           filePath = filePath.replace(/^.+?\/|^.+/g, '');
           try {
             // console.log(file, filePath);
-            zip.addLocalFile(file, filePath);
+            // zip.addLocalFile(file, filePath);
+            if (fileBuffer) {
+              zip.addLocalFile(filePath, fileBuffer);
+            }
           } catch (e) {
             errorList.push(e);
           }
         });
 
-        zip.writeZip(archiveDirectory + size + '.zip');
-        allFiles[size] = allFiles[size] || {};
-        allFiles[size].results = fileList;
-        allFiles[size].errors = errorList;
+        // zip.writeZip(archiveDirectory + size + '.zip');
+        zip.generateAsync({type:'nodebuffer'})
+          .then(function(content) {
+            fs.writeFileSync(archiveDirectory + size + '.zip', content);
+            allFiles[size] = allFiles[size] || {};
+            allFiles[size].results = fileList;
+            allFiles[size].errors = errorList;
+            resolve(allFiles);
+          }).catch(e => reject(e));
       } catch (e) {
         reject(e);
       }
     });
-    fulfill(allFiles);
   });
 };

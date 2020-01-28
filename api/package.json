@@ -25,7 +25,7 @@
     "url": "http://github.com/nationalparkservice/places-mobile-api"
   },
   "dependencies": {
-    "adm-zip": "0.4.13",
+    "jszip": "3.2.2",
     "bluebird": "3.7.0",
     "datawrap": "git+http://github.com/jimmyrocks/datawrap.git",
     "edgegrid": "3.0.8",
