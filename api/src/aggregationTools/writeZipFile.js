@@ -1,9 +1,9 @@
 var JSZip = require('jszip');
 var mkdirp = require('mkdirp');
 var path = require('path');
-var fs = require('fs');
+var fs = require('fs').promises;
 
-var cleanArray = function (array) {
+var cleanArray = function(array) {
   // removes nulls and duplicates
   var newArray = [];
   array.forEach(item => {
@@ -14,12 +14,12 @@ var cleanArray = function (array) {
   return newArray;
 };
 
-var getMediaList = function (template, appJson) {
+var getMediaList = function(template, appJson) {
   var ref = template.reference.split('.');
   var ids = [];
   var returnValue;
 
-  var readTree = function (trunk, branches) {
+  var readTree = function(trunk, branches) {
     if (branches.length === 1) {
       if (trunk[branches[0]]) {
         if (Array.isArray(trunk[branches[0]])) {
@@ -46,7 +46,7 @@ var getMediaList = function (template, appJson) {
   return returnValue;
 };
 
-var getFiles = function (mediaTemplate, field, appJson, config, unitCode) {
+var getFiles = function(mediaTemplate, field, appJson, config, unitCode) {
   var fileList = [];
   var media;
   var prefix = config.fileLocation + '/' + (mediaTemplate.type === 'icon' ? 'icons/' : unitCode + '/media/');
@@ -62,11 +62,11 @@ var getFiles = function (mediaTemplate, field, appJson, config, unitCode) {
   return cleanArray(fileList);
 };
 
-module.exports = function (appJson, unitCode, config, sizes) {
+module.exports = function(appJson, unitCode, config, sizes) {
   return new Promise((resolve, reject) => {
     var archiveDirectory = config.fileLocation + '/' + unitCode + '/archives/';
     var allFiles = {};
-    sizes = sizes || function () {
+    sizes = sizes || function() {
       var returnValue = [];
       for (var size in config.zipFields) {
         returnValue.push(size);
@@ -75,7 +75,7 @@ module.exports = function (appJson, unitCode, config, sizes) {
     }();
     mkdirp.sync(archiveDirectory);
 
-    sizes.forEach(function (size) {
+    sizes.forEach(function(size) {
       var zip = new JSZip();
       var fileList = [];
       var errorList = [];
@@ -87,42 +87,43 @@ module.exports = function (appJson, unitCode, config, sizes) {
             fileList = cleanArray(fileList.concat(getFilesRes));
           }
         }
-        fileList.forEach(function (file) {
-          var fileBuffer;
-          try {
-            fileBuffer = fs.readFileSync(file);
-          } catch(e) {
-            // Report missing file
-            console.log('File missing:', file);
-          }
-          var filePath = file.replace(config.fileLocation + '/', '');
-          if (filePath.substr(0, 5) !== 'icons') {
-            filePath = filePath.replace(/^.+?\//g, '');
-          }
-          // console.log(filePath, path.dirname(filePath));
-          filePath = path.dirname(filePath);
-          // Put all the files in the root
-          filePath = filePath.replace(/^.+?\/|^.+/g, '');
-          try {
-            // console.log(file, filePath);
-            // zip.addLocalFile(file, filePath);
-            if (fileBuffer) {
-              zip.addLocalFile(filePath, fileBuffer);
-            }
-          } catch (e) {
-            errorList.push(e);
-          }
-        });
 
-        // zip.writeZip(archiveDirectory + size + '.zip');
-        zip.generateAsync({type:'nodebuffer'})
-          .then(function(content) {
-            fs.writeFileSync(archiveDirectory + size + '.zip', content);
-            allFiles[size] = allFiles[size] || {};
-            allFiles[size].results = fileList;
-            allFiles[size].errors = errorList;
-            resolve(allFiles);
+        Promise.all(fileList.map(function(file) {
+          return new Promise((fileResolve, fileReject) => {
+            fs.readFile(file).then(fileBuffer => {
+              var filePath = file.replace(config.fileLocation + '/', '');
+              if (filePath.substr(0, 5) !== 'icons') {
+                filePath = filePath.replace(/^.+?\//g, '');
+              }
+              // filePath = path.dirname(filePath);
+              // Put all the files in the root
+              filePath = filePath.replace(/^.+?\/|^.+/g, '');
+              try {
+                zip.file(filePath, fileBuffer);
+                // console.log('success', filePath, file, fileBuffer.length);
+              } catch (e) {
+                console.log('ERROR', e);
+                errorList.push(e);
+              }
+              fileResolve(file);
+            }).catch(e => {
+              // Report missing file
+              console.log('Missing File:', file);
+              fileResolve(file);
+            });
+          })
+        })).then(() => {
+          zip.generateAsync({
+            type: 'nodebuffer'
+          }).then(content => {
+            fs.writeFile(archiveDirectory + size + '.zip', content).then(() => {
+              allFiles[size] = allFiles[size] || {};
+              allFiles[size].results = fileList;
+              allFiles[size].errors = errorList;
+              resolve(allFiles);
+            });
           }).catch(e => reject(e));
+        });
       } catch (e) {
         reject(e);
       }
