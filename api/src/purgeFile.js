@@ -1,6 +1,10 @@
 var Promise = require('bluebird');
 var EdgeGrid = require('edgegrid');
+var request = require('request-promise');
+var querystring = require("querystring");
 var eg;
+
+var purgeUrl = 'https://cms.nps.gov/purge/fastpurge.cfm?';
 
 function updateList(fileList, unitCode, config) {
   eg = eg || new EdgeGrid(
@@ -35,7 +39,10 @@ function updateList(fileList, unitCode, config) {
             fulfill(response.purgeId);
           } else {
             console.log('purge error', response);
-            reject(new Error(response));
+            // Try to purge it a different way
+            Promise.all(urlList.map(url => request(purgeUrl + querystring.stringify({
+              'path': url
+            })))).then(() => fulfill(response.purgeId)).catch(e => reject(new Error(e)));
           }
         }
       });
