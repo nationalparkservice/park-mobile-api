@@ -25,7 +25,6 @@
     "url": "http://github.com/nationalparkservice/places-mobile-api"
   },
   "dependencies": {
-    "jszip": "3.2.2",
     "bluebird": "3.7.0",
     "datawrap": "git+http://github.com/jimmyrocks/datawrap.git",
     "edgegrid": "3.0.8",
@@ -33,12 +32,14 @@
     "fandlebars": "git+http://github.com/jimmyrocks/fandlebars.git",
     "glob": "7.1.4",
     "gm": "1.23.1",
+    "jszip": "3.2.2",
     "magick-resize": "git+http://github.com/jimmyrocks/magick-resize.git",
     "method-override": "2.3.10",
     "minimist": "1.2.0",
     "mkdirp": "0.5.1",
     "multer": "1.4.2",
     "node-persist": "2.1.0",
-    "request": "2.88.0"
+    "request": "2.88.0",
+    "request-promise": "^4.2.5"
   }
 }
