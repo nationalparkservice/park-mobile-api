@@ -1,5 +1,5 @@
 var fs = require('fs');
-var Bluebird = require('datawrap').Bluebird;
+var Bluebird = require('bluebird');;
 var writeAppJson = require('../writeAppJson');
 var config = require('../../buildConfig')();
 fs = Bluebird.promisifyAll(fs);

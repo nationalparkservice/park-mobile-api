@@ -3,17 +3,22 @@ var storage = require('node-persist');
 
 var statusFunction = function (status, name) {
   return new Promise(function (fulfill, reject) {
-    storage.initSync();
-    storage.setItem(name, status).then(
-      function () {
-        // success
-        fulfill(storage.getItem(name));
-      },
-      function () {
-        // Error
+    console.error('a1');
+    storage.init().then(function() {
+      console.error('a2');
+      storage.init().then(function() {
+        console.error('a3');
+        storage.setItem(name, status).then(function () {
+          console.error('a4');
+          storage.getItem(name).then(function (item) {
+            console.error('a5', item);
+            fulfill(item);
+          }).catch(function() {reject('Storage Error A');});
+        }).catch(function () {reject('Storage Error B');});
+      }).catch(function() {
         reject('Storage Error');
-      }
-    );
+      });
+    });
   });
 };
 

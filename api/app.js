@@ -1,7 +1,7 @@
 var Api = require('./src/api');
 var allowXSS = require('./src/allowXSS');
 var express = require('express');
-var port = process.env.API_PORT;
+var port = 3001; //process.env.API_PORT;
 
 var app = express();
 var api = new Api();

@@ -25,21 +25,21 @@
     "url": "http://github.com/nationalparkservice/places-mobile-api"
   },
   "dependencies": {
-    "bluebird": "3.7.0",
-    "datawrap": "git+http://github.com/jimmyrocks/datawrap.git",
+    "bluebird": "3.7.2",
     "edgegrid": "3.0.8",
     "express": "4.17.1",
     "fandlebars": "git+http://github.com/jimmyrocks/fandlebars.git",
-    "glob": "7.1.4",
+    "glob": "7.2.0",
     "gm": "1.23.1",
-    "jszip": "3.2.2",
+    "jszip": "3.7.1",
     "magick-resize": "git+http://github.com/jimmyrocks/magick-resize.git",
-    "method-override": "2.3.10",
-    "minimist": "1.2.0",
-    "mkdirp": "0.5.1",
-    "multer": "1.4.2",
-    "node-persist": "2.1.0",
-    "request": "2.88.0",
-    "request-promise": "^4.2.5"
+    "method-override": "3.0.0",
+    "minimist": "1.2.5",
+    "mkdirp": "1.0.4",
+    "multer": "1.4.3",
+    "node-persist": "3.1.0",
+    "pg": "^8.7.1",
+    "request": "2.88.2",
+    "request-promise": "^4.2.6"
   }
 }

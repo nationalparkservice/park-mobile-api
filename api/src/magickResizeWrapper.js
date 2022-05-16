@@ -1,7 +1,7 @@
 var Promise = require('bluebird');
 var fs = require('fs');
 var magickResize = require('magick-resize');
-var mkdirp = require('mkdirp');
+var mkdirp = require('./mkdirpCallback');
 var path = require('path');
 
 Promise.promisifyAll(fs);

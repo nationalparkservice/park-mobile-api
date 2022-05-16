@@ -5,7 +5,7 @@ var fs = require('fs');
 var geoTools = require('../geoTools.js');
 var magickResizeWrapper = require('../magickResizeWrapper');
 var magickTypes = require('../../node_modules/magick-resize/types');
-var mkdirp = require('mkdirp');
+var mkdirp = require('../mkdirpCallback');
 var path = require('path');
 var thumbnailSettings = require('../../config/thumbnailSettings');
 

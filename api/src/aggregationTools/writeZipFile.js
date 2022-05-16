@@ -1,5 +1,5 @@
 var JSZip = require('jszip');
-var mkdirp = require('mkdirp');
+var mkdirp = require('../mkdirpCallback');
 var path = require('path');
 var fs = require('fs').promises;
 

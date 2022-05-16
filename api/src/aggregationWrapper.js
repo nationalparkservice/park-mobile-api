@@ -28,9 +28,11 @@ var createThumbnailList = function(siteId) {
 };
 
 var reportError = function(error, result) {
+  let e = new Error();
   config.debug && console.log('agg error', error);
   result.error({
-    'Error': error
+    'Error': error,
+    'Stack': e.stack
   });
 };
 

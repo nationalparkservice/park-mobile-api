@@ -9,6 +9,7 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 3001:3001
+      - 3002:3002
     env_file:
       - ./config/environment.env
     volumes:
@@ -17,4 +18,4 @@ services:
       - ./config:/code/config
       - /mnt/npmap/projects/places-mobile:/places-mobile
     tty: true
-    command: node /code/app.js
+    command: ['sh', '-c', 'crond -l 2 -f & node /code/app.js']

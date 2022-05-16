@@ -1,6 +1,6 @@
 var Promise = require('bluebird');
 var fs = require('fs');
-var mkdirp = require('mkdirp');
+var mkdirp = require('../mkdirpCallback');
 var path = require('path');
 fs = Promise.promisifyAll(fs);
 

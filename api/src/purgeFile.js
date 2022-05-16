@@ -4,7 +4,7 @@ var request = require('request-promise');
 var querystring = require("querystring");
 var eg;
 
-var purgeUrl = 'https://cms.nps.gov/purge/fastpurge.cfm?';
+var purgeUrl = 'https://cms.nps.gov/purge/CloudFrontPurge.cfm?';
 
 function updateList(fileList, unitCode, config) {
   eg = eg || new EdgeGrid(
@@ -20,7 +20,12 @@ function updateList(fileList, unitCode, config) {
     if (urlList.length === 0) {
 
       fulfill('no purge');
+    } else if (true) {
+      Promise.all(urlList.map(url => request(purgeUrl + querystring.stringify({
+        'urls': url
+      })))).then(() => fulfill(Math.random().toString(32).substr(2))).catch(e => reject(new Error(e)));
     } else {
+      // We no longer have akamai
       // Create the Auth Object with the Payload
       eg.auth({
         body: {
@@ -41,7 +46,7 @@ function updateList(fileList, unitCode, config) {
             console.log('purge error', response);
             // Try to purge it a different way
             Promise.all(urlList.map(url => request(purgeUrl + querystring.stringify({
-              'path': url
+              'urls': url
             })))).then(() => fulfill(response.purgeId)).catch(e => reject(new Error(e)));
           }
         }

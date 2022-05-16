@@ -31,6 +31,13 @@ module.exports = function() {
         'protocol': process.env.CARTODB_PROTOCOL,
         'url': process.env.CARTODB_URL
       },
+      internalCarto: {
+        'username': process.env.CARTO_PGUSER,
+        'password': process.env.CARTO_PGPASSWORD,
+        'type': 'postgresql',
+        'address': process.env.CARTO_PGHOST,
+        'dbname': process.env.CARTO_DBNAME
+      },
       defaults: undefined
     },
     fileLocation: process.env.API_FILE_LOCATION,

@@ -2,7 +2,7 @@
 
 // Requires
 var Promise = require('bluebird');
-var datawrap = require('datawrap');
+var pg = require('pg');
 var fandlebars = require('fandlebars');
 var fs = require('fs');
 var iterateTasks = require('../iterateTasks');
@@ -15,7 +15,7 @@ var readTypes = {
       return new Promise(function (fulfill, reject) {
         var buildSql = function () {
           var sqlParts = schemaPart.source.sql;
-          var sqlString = 'SELECT {{fields}} FROM {{table}} WHERE {{where}}{{extras}}';
+          var sqlString = 'SELECT {{fields}} FROM "park-mobile".{{table}} WHERE {{where}}{{extras}}';
           var getFields = function (props, fields) {
             // Get the fields from the properties
             var newFields = [];
@@ -61,15 +61,26 @@ var readTypes = {
         if (!sqlStatement) {
           reject('No fields');
         } else {
-          datawrap(config.database.cartodb, config.database.defaults).runQuery(sqlStatement)
+          let client = new pg.Client({
+            user: config.database.internalCarto.username,
+            host: config.database.internalCarto.address,
+            database: config.database.internalCarto.dbname,
+            password: config.database.internalCarto.password,
+            port: 5432
+          });
+          client.connect();
+          client.query(sqlStatement)
             .then(function (result) {
-              if (result[0] && result[0].rows) {
-                fulfill(result[0].rows);
+              if (result && result.rows) {
+                fulfill(result.rows);
               } else {
                 reject('No rows');
               }
             })
-            .catch(reject);
+            .catch(reject)
+            .finally(function() {
+              client.end();
+            });
         }
       });
     }
